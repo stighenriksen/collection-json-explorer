@@ -6,8 +6,12 @@
     "start": "node app"
   },
   "dependencies": {
-    "express": "3.0.0beta4",
     "collection_json": "git+http://trygvis.dyndns.org/~trygvis/git/2012/06/collection_json.git",
-    "jade": "*"
+    "express": "3.0.0beta4",
+    "jade": "~0.26.3"
+  },
+  "engines": {
+    "node": "0.6.x",
+    "npm": "1.1.x"
   }
 }
