@@ -1,8 +1,8 @@
 extends layout
 
 block content
-  h1= title
-  p Welcome to #{title}
+  h1 Collection+JSON Explorer
+  p Viewing #{url}
 
   form(action="/render")
     p
@@ -24,7 +24,9 @@ block content
     h1
       a(href="#items") Items
   each item, i in doc.items
-    h2 Item ##{i+1}
+    a(id="item-#{i+1}")
+      h2
+        a(href="#item-#{i+1}") Item ##{i+1}
     h3 Data
       ul
       each data in item.data

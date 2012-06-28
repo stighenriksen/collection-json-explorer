@@ -23,7 +23,7 @@ exports.render = function(req, res){
     clientRes.on('end', function (chunk) {
       var doc = collection_json.fromObject(JSON.parse(body));
       res.render('data', {
-        title: 'Rendering ' + req.query.url,
+        url: req.query.url,
         doc: doc,
         headers: clientRes.headers,
         raw: body,
