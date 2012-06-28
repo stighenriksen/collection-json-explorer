@@ -1,0 +1,49 @@
+extends layout
+
+block content
+  h1= title
+  p Welcome to #{title}
+
+  form(action="/render")
+    p
+      label URL:
+        input(name="url", value="http://p2k12.bitraf.no/checkins-trygvis.php")
+      input(type="submit", value="Render")
+
+  ul
+    li
+      a(href="#items") Items
+    li
+      a(href="#headers") Headers
+    li
+      a(href="#body") Raw body
+    li
+      a(href="#formatted-body") Formatted body
+
+  a(id="items")
+    h1
+      a(href="#items") Items
+  each item, i in doc.items
+    h2 Item ##{i+1}
+    h3 Data
+      ul
+      each data in item.data
+        li #{data.name}: #{data.value}
+
+  a(id="headers")
+    h1
+      a(href="#headers") Headers
+  pre
+    each value, key in headers
+      span #{key}: #{value}
+      br
+
+  a(id="body")
+    h1
+      a(href="#body") Raw body
+  pre= raw
+
+  a(id="formatted-body")
+    h1
+      a(href="#formatted-body") Formatted body
+  pre= formattedRaw

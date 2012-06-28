@@ -1,0 +1,11 @@
+extends layout
+
+block content
+  h1= title
+  p Welcome to #{title}
+
+  form(action="/render")
+    p
+      label URL:
+        input(name="url", value="http://p2k12.bitraf.no/checkins-trygvis.php")
+      input(type="submit", value="Render")

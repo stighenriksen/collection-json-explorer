@@ -1,0 +1,13 @@
+{
+  "name": "application-name",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "start": "node app"
+  },
+  "dependencies": {
+    "express": "3.0.0beta4",
+    "collection_json": "git+http://trygvis.dyndns.org/~trygvis/git/2012/06/collection_json.git",
+    "jade": "*"
+  }
+}
