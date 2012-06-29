@@ -12,10 +12,11 @@ block content
 
   h2 Examples
 
-    p Taken from
-    a(url='http://amundsen.com/media-types/collection/examples/') Mike Admundsen's examples
+    p Taken from 
+      a(href='http://amundsen.com/media-types/collection/examples/') Mike Admundsen's examples
 
+  ul
   each example in examples
-    form(action='/render')
-      input(name='url', type='hidden', value='http://#{host}/examples/from-spec/#{example}.collection+json')
-      input(type='submit', value='#{example}')
+    li
+      - var u='http://' + host + '/render?url=' + encodeURIComponent('http://' + host + '/examples/from-spec/' + example + '.collection+json')
+      a(href='#{u}') #{example}
