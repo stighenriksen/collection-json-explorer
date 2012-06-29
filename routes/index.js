@@ -25,7 +25,17 @@ exports.render = function(req, res){
     else {
       var parsedBody = JSON.parse(body);
       var doc = collection_json.fromObject(parsedBody);
+      var isUrl = function(u) {
+        try {
+          var x = url.parse(u);
+          return _.isString(x.protocol) && _.isString(x.host) && _.isString(path);
+        }
+        catch(e) {
+          return false;
+        }
+      };
       res.render('data', {
+        isUrl: isUrl,
         url: req.query.url,
         doc: doc,
         headers: headers,

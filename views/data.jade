@@ -1,5 +1,30 @@
 extends layout
 
+block link
+  - var name = typeof link.name == 'string' ? link.name : '<no name attribute>'
+  - var prompt = typeof link.prompt == 'string' ? link.prompt : '<no prompt attribute>'
+  table
+    tr
+      td href
+      td: a(href=link.href, name=link.name) #{link.href}
+    tr
+      td rel
+      td 
+        if isUrl(link.rel)
+          a(href=link.rel) #{link.rel}
+        else
+          | #{link.rel}
+    tr
+      td name
+      td #{name}
+    tr
+      td prompt
+      td #{prompt}
+    if link.render == 'image'
+      tr
+        td
+        td: img(src=link.href, alt=link.name, title=name)
+
 block content
   h1 Collection+JSON Explorer
   p Viewing #{url}
@@ -7,12 +32,12 @@ block content
   form(action="/render")
     p
       label URL:
-        input(name="url", value="#{url}")
+        input(name="url", value=url)
       input(type="submit", value="Render")
 
   form(action="http://redbot.org/?")
     p
-      input(name="uri", value="#{url}", type="hidden")
+      input(name="uri", value=url, type="hidden")
       input(type="submit", value="Check with redbot.org")
 
   ul
@@ -23,9 +48,9 @@ block content
     li
       a(href="#headers") Headers
     li
-      a(href="#body") Raw body
-    li
       a(href="#formatted-body") Formatted body
+    li
+      a(href="#body") Raw body
 
   a(id="meta")
     h1
@@ -39,25 +64,37 @@ block content
         td URI
         td
           if typeof doc.uri == 'string'
-            a(href="#{doc.uri}") #{doc.uri}
+            a(href=doc.uri) #{doc.uri}
           else
             span No URI
 
-  a(id="items")
-    h1
-      a(href="#items") Items
+    h2 Collection Links
+    each link, i in doc.links
+      h3 Collection Link ##{i}
+      block link
+
+  a(id="items"): h1: a(href="#items") Items
   each item, i in doc.items
     a(id="item-#{i+1}")
-      h2
-        a(href="#item-#{i+1}") Item ##{i+1}
-    h3 Data
-      ul
-      each data in item.data
-        li #{data.name}: #{data.value}
+      h2: a(href="#item-#{i+1}") Item ##{i+1}
 
-  a(id="headers")
-    h1
-      a(href="#headers") Headers
+    if typeof item.href == 'string'
+      | href 
+      a(href=item.href) #{item.href}
+
+    h2 Item Links
+    each link, i in item.links
+      h3 Item Link ##{i}
+      block link
+
+    h3 Data
+      table
+        each data in item.data
+          tr
+            td #{data.name}
+            td #{data.value}
+
+  a(id="headers"): h1: a(href="#headers") Headers
   pre
     table
       each value, key in headers
@@ -65,12 +102,8 @@ block content
           td #{key}:
           td #{value}
 
-  a(id="body")
-    h1
-      a(href="#body") Raw body
-  pre= raw
-
-  a(id="formatted-body")
-    h1
-      a(href="#formatted-body") Formatted body
+  a(id="formatted-body"): h1: a(href="#formatted-body") Formatted body
   pre= formattedRaw
+
+  a(id="body"): h1: a(href="#body") Raw body
+  pre= raw
