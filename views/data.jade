@@ -7,10 +7,17 @@ block content
   form(action="/render")
     p
       label URL:
-        input(name="url", value="http://p2k12.bitraf.no/checkins-trygvis.php")
+        input(name="url", value="#{url}")
       input(type="submit", value="Render")
 
+  form(action="http://redbot.org/?")
+    p
+      input(name="uri", value="#{url}", type="hidden")
+      input(type="submit", value="Check with redbot.org")
+
   ul
+    li
+      a(href="#meta") Meta
     li
       a(href="#items") Items
     li
@@ -19,6 +26,22 @@ block content
       a(href="#body") Raw body
     li
       a(href="#formatted-body") Formatted body
+
+  a(id="meta")
+    h1
+      a(href="#meta") Meta
+
+    table
+      tr
+        td Version
+        td #{doc.version}
+      tr
+        td URI
+        td
+          if typeof doc.uri == 'string'
+            a(href="#{doc.uri}") #{doc.uri}
+          else
+            span No URI
 
   a(id="items")
     h1
@@ -36,9 +59,11 @@ block content
     h1
       a(href="#headers") Headers
   pre
-    each value, key in headers
-      span #{key}: #{value}
-      br
+    table
+      each value, key in headers
+        tr
+          td #{key}:
+          td #{value}
 
   a(id="body")
     h1

@@ -13,21 +13,20 @@ exports.render = function(req, res){
     accept: 'application/vnd.collection+json'
   };
   var clientReq = http.request(options, function(clientRes) {
-    console.log('STATUS: ' + clientRes.statusCode);
-    console.log('HEADERS: ' + JSON.stringify(clientRes.headers));
     clientRes.setEncoding('utf8');
-    var body = "";
+    var body = '';
     clientRes.on('data', function (chunk) {
       body += chunk;
     });
     clientRes.on('end', function (chunk) {
-      var doc = collection_json.fromObject(JSON.parse(body));
+      var parsedBody = JSON.parse(body);
+      var doc = collection_json.fromObject(parsedBody);
       res.render('data', {
         url: req.query.url,
         doc: doc,
         headers: clientRes.headers,
         raw: body,
-        formattedRaw: JSON.stringify(JSON.parse(body), null, '  ') });
+        formattedRaw: JSON.stringify(parsedBody, null, '  ') });
     });
   });
   clientReq.on('error', function() {
