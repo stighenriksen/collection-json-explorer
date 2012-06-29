@@ -2,6 +2,14 @@ var http = require('http')
   , url = require('url')
   , collection_json = require('collection_json');
 
+function urlgenerator(req) {
+  var host = req.headers.host;
+  return {
+    render: function(u) {
+      return 'http://' + host + '/render?url=' + encodeURIComponent(u)}
+  };
+}
+
 exports.index = function(req, res){
   res.render('index', {
     title: 'Collection+JSON Explorer',
@@ -17,14 +25,23 @@ exports.index = function(req, res){
   });
 };
 
-exports.render = function(req, res){
+exports.render = function(req, res) {
+  function sendErr(err) {
+    res.render('data', {
+      url: req.query.url,
+      err: err
+    });
+  }
   fetchCollection(req.query.url, function(err, headers, body) {
     if(err) {
-      res.render('index', { title: 'Failed to render ' + req.query.url });
+      sendErr(err);
     }
     else {
-      var parsedBody = JSON.parse(body);
-      var doc = collection_json.fromObject(parsedBody);
+      var parsedBody;
+      try {
+        parsedBody = JSON.parse(body);
+      } catch(e) { sendErr('Unable to parse JSON: ' + e); }
+      var doc = collection_json.fromObject(parsedBody).collection;
       var isUrl = function(u) {
         try {
           var x = url.parse(u);
@@ -36,6 +53,7 @@ exports.render = function(req, res){
       };
       res.render('data', {
         isUrl: isUrl,
+        urlgenerator: urlgenerator(req),
         url: req.query.url,
         doc: doc,
         headers: headers,

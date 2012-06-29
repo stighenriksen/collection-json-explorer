@@ -1,12 +1,23 @@
 extends layout
 
+block href
+  if typeof href != 'string'
+    | &lt;no href>
+  else
+    span
+      a(href=href) #{href}
+      | 
+      a(href=urlgenerator.render(href)) Explore
+
 block link
   - var name = typeof link.name == 'string' ? link.name : '<no name attribute>'
   - var prompt = typeof link.prompt == 'string' ? link.prompt : '<no prompt attribute>'
+  - var href = link.href
   table
     tr
       td href
-      td: a(href=link.href, name=link.name) #{link.href}
+      td
+        block href
     tr
       td rel
       td 
@@ -25,14 +36,18 @@ block link
         td
         td: img(src=link.href, alt=link.name, title=name)
 
-block content
-  h1 Collection+JSON Explorer
+block err
+  p Error rendering #{url}
+
+  p= err
+
+block data
   p Viewing #{url}
 
   form(action="/render")
     p
       label URL:
-        input(name="url", value=url)
+        input(name="url", size=100, value=url)
       input(type="submit", value="Render")
 
   form(action="http://redbot.org/?")
@@ -52,47 +67,53 @@ block content
     li
       a(href="#body") Raw body
 
-  a(id="meta")
-    h1
-      a(href="#meta") Meta
+  a(id="meta"): h1: a(href="#meta") Meta
 
-    table
-      tr
-        td Version
-        td #{doc.version}
-      tr
-        td URI
-        td
-          if typeof doc.uri == 'string'
-            a(href=doc.uri) #{doc.uri}
-          else
-            span No URI
+  - var href=doc.href
+  table
+    tr
+      td version
+      td #{doc.version}
+    tr
+      td href
+      td: block href
 
-    h2 Collection Links
+  h2 Collection Links
+  if doc.links.length == 0
+    p Collection has no links.
+  else
     each link, i in doc.links
-      h3 Collection Link ##{i}
+      - var title = link.prompt || link.name
+      - title = title ? ": " + title : ""
+      h3 Collection Link ##{i}#{title}
       block link
 
   a(id="items"): h1: a(href="#items") Items
-  each item, i in doc.items
-    a(id="item-#{i+1}")
-      h2: a(href="#item-#{i+1}") Item ##{i+1}
+  if doc.items.length == 0
+    p Collection has to items.
+  else
+    p The feed has #{doc.items.length} items.
+    each item, i in doc.items
+      a(id="item-#{i+1}"): h2: a(href="#item-#{i+1}") Item ##{i+1}
 
-    if typeof item.href == 'string'
-      | href 
-      a(href=item.href) #{item.href}
+      - var href=item.href
+      p href: 
+        block href
 
-    h2 Item Links
-    each link, i in item.links
-      h3 Item Link ##{i}
-      block link
+      h3 Item Links
+      if item.links.length == 0
+        p Item has no links.
+      else
+        each link, i in item.links
+          h4 Item Link ##{i}
+          block link
 
-    h3 Data
-      table
-        each data in item.data
-          tr
-            td #{data.name}
-            td #{data.value}
+      h3 Data
+        table
+          each data in item.data
+            tr
+              td #{data.name}
+              td #{data.value}
 
   a(id="headers"): h1: a(href="#headers") Headers
   pre
@@ -107,3 +128,11 @@ block content
 
   a(id="body"): h1: a(href="#body") Raw body
   pre= raw
+
+block content
+  h1 Collection+JSON Explorer
+
+  if typeof err == 'undefined'
+    block data
+  else
+    block err

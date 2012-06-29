@@ -3,19 +3,23 @@ extends layout
 block content
   h1 Collection+JSON Explorer
 
+  div This is a simple/dumb explorer for the 
+    a(href='http://amundsen.com/media-types/collection/') Collection+JSON Hypermedia
+    | .
+
   h2 Explore your own collection
   form(action='/render')
     p
       label URL:
-        input(name='url', value='http://p2k12.bitraf.no/checkins-trygvis.php')
+        input(name='url', size='100', value='http://example-collection-json-db.herokuapp.com/')
       input(type='submit', value='Render')
 
   h2 Examples
-
-    p Taken from: 
-      a(href='http://amundsen.com/media-types/collection/examples/') Mike Amundsen's examples
+  p Taken from: 
+    a(href='http://amundsen.com/media-types/collection/examples/') Mike Amundsen's examples
 
   ul
+  - var examples = examples || []
   each example in examples
     li
       - var u='http://' + host + '/render?url=' + encodeURIComponent('http://' + host + '/examples/from-spec/' + example + '.collection+json')
