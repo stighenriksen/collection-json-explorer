@@ -1,12 +1,12 @@
 {
-  "name": "application-name",
+  "name": "collection+json-explorer",
   "version": "0.0.1",
   "private": true,
   "scripts": {
     "start": "node app"
   },
   "dependencies": {
-    "collection_json": "git+http://trygvis.dyndns.org/~trygvis/git/2012/06/collection_json.git",
+    "collection+json": "git+http://trygvis.dyndns.org/~trygvis/git/2012/06/collection+json.js.git",
     "express": "3.0.0beta4",
     "jade": "~0.26.3"
   },
