@@ -3,34 +3,53 @@ var http = require('http')
   , collection_json = require('collection_json');
 
 exports.index = function(req, res){
-  res.render('index', { title: 'Express' });
+  res.render('index', {
+    title: 'Collection+JSON Explorer',
+    host: req.headers.host,
+    examples: [
+      "minimal",
+      "collection",
+      "item",
+      "queries",
+      "template",
+      "error"
+    ]
+  });
 };
 
 exports.render = function(req, res){
-  var options = url.parse(req.query.url);
-  options.method = 'GET';
-  options.headers = {
-    accept: 'application/vnd.collection+json'
-  };
-  var clientReq = http.request(options, function(clientRes) {
-    clientRes.setEncoding('utf8');
-    var body = '';
-    clientRes.on('data', function (chunk) {
-      body += chunk;
-    });
-    clientRes.on('end', function (chunk) {
+  fetchCollection(req.query.url, function(err, headers, body) {
+    if(err) {
+      res.render('index', { title: 'Failed to render ' + req.query.url });
+    }
+    else {
       var parsedBody = JSON.parse(body);
       var doc = collection_json.fromObject(parsedBody);
       res.render('data', {
         url: req.query.url,
         doc: doc,
-        headers: clientRes.headers,
+        headers: headers,
         raw: body,
         formattedRaw: JSON.stringify(parsedBody, null, '  ') });
-    });
+    }
   });
-  clientReq.on('error', function() {
-    res.render('index', { title: 'Failed to render ' + req.query.url });
-  });
-  clientReq.end();
 };
+
+function fetchCollection(u, cb) {
+  var options = url.parse(u);
+  options.headers = {
+    accept: 'application/vnd.collection+json'
+  };
+  var req = http.get(options, function(res) {
+    res.setEncoding('utf8');
+    var body = '';
+    res.on('data', function (chunk) {
+      body += chunk;
+    });
+    res.on('end', function (chunk) {
+      cb(undefined, res.headers, body);
+    });
+  }).on('error', function() {
+    cb('Unable to fetch ' + u);
+  });
+}

@@ -3,8 +3,19 @@ extends layout
 block content
   h1 Collection+JSON Explorer
 
-  form(action="/render")
+  h2 Explore your own collection
+  form(action='/render')
     p
       label URL:
-        input(name="url", value="http://p2k12.bitraf.no/checkins-trygvis.php")
-      input(type="submit", value="Render")
+        input(name='url', value='http://p2k12.bitraf.no/checkins-trygvis.php')
+      input(type='submit', value='Render')
+
+  h2 Examples
+
+    p Taken from
+    a(url='http://amundsen.com/media-types/collection/examples/') Mike Admundsen's examples
+
+  each example in examples
+    form(action='/render')
+      input(name='url', type='hidden', value='http://#{host}/examples/from-spec/#{example}.collection+json')
+      input(type='submit', value='#{example}')

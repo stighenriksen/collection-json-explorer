@@ -2,6 +2,10 @@ var express = require('express')
   , routes = require('./routes')
   , http = require('http');
 
+express.mime.define({
+  'application/vnd.collection+json': ['collection+json']
+});
+
 var app = express();
 
 app.configure(function(){
