@@ -49,6 +49,7 @@ block meta
   form(action='http://redbot.org/?')
     p
       input(name='uri', value=url, type='hidden')
+      input(name='req_hdr', value='Accept: application/vnd.collection+json', type='hidden')
       input(type='submit', value='Check with redbot.org')
 
 
