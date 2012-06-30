@@ -1,7 +1,7 @@
 extends layout
 
 block content
-  h1 Collection+JSON Explorer
+  h1= title
 
   div This is a simple/dumb explorer for the 
     a(href='http://amundsen.com/media-types/collection/') Collection+JSON Hypermedia
@@ -18,9 +18,9 @@ block content
   p Taken from: 
     a(href='http://amundsen.com/media-types/collection/examples/') Mike Amundsen's examples
 
-  ul
   - var examples = examples || []
-  each example in examples
-    li
+  ul
+    each example in examples
       - var u='http://' + host + '/render?url=' + encodeURIComponent('http://' + host + '/examples/from-spec/' + example + '.collection+json')
-      a(href='#{u}') #{example}
+      li
+        a(href='#{u}') #{example}
