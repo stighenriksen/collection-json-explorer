@@ -3,24 +3,32 @@ extends layout
 block content
   h1= title
 
-  div This is a simple/dumb explorer for the 
+  form(action='/render', class='well')
+    div(class='row')
+      div(class='span10')
+        input(name='url', size='100', placeholder='Enter URL to explore...', class='span10')
+    // TODO: Fix
+    div(class='row')
+      div(class='span12')
+        &nbsp;
+    div(class='row')
+      div(class='offset4 span2')
+        button(type='submit', class='btn') Explore
+
+  p This is a simple/dumb explorer for the 
     a(href='http://amundsen.com/media-types/collection/') Collection+JSON Hypermedia
     | .
 
-  h2 Explore your own collection
-  form(action='/render')
-    p
-      label URL:
-        input(name='url', size='100', value='http://example-collection-json-db.herokuapp.com/')
-      input(type='submit', value='Render')
-
   h2 Examples
-  p Taken from: 
-    a(href='http://amundsen.com/media-types/collection/examples/') Mike Amundsen's examples
 
-  - var examples = examples || []
-  ul
-    each example in examples
-      - var u='http://' + host + '/render?url=' + encodeURIComponent('http://' + host + '/examples/from-spec/' + example + '.collection+json')
-      li
-        a(href='#{u}') #{example}
+  p From the 
+    a(href='http://' + host + '/render?url=http%3A%2F%2Fexample-collection-json-db.herokuapp.com') Example Collection+JSON
+    |  application. Drill down in an employee data set.
+
+  p From the specification: 
+    - var examples = [ "minimal", "collection", "item", "queries", "template", "error" ]
+      each example, i in examples
+        - var u='http://' + host + '/render?url=' + encodeURIComponent('http://' + host + '/examples/from-spec/' + example + '.collection+json')
+          if i > 0
+            | , 
+          a(href='#{u}') #{example}

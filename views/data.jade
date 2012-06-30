@@ -36,65 +36,41 @@ block link
         td
         td: img(src=link.href, alt=link.name, title=name)
 
-block err
-  p Error rendering #{url}
-
-  p= err
-
-block data
-  p Viewing #{url}
-
-  form(action="/render")
-    p
-      label URL:
-        input(name="url", size=100, value=url)
-      input(type="submit", value="Render")
-
-  form(action="http://redbot.org/?")
-    p
-      input(name="uri", value=url, type="hidden")
-      input(type="submit", value="Check with redbot.org")
-
-  ul
-    li
-      a(href="#meta") Meta
-    li
-      a(href="#items") Items
-    li
-      a(href="#headers") Headers
-    li
-      a(href="#formatted-body") Formatted body
-    li
-      a(href="#body") Raw body
-
-  a(id="meta"): h1: a(href="#meta") Meta
-
-  - var href=doc.href
+block meta
+  - var href=collection.href
   table
     tr
       td version
-      td #{doc.version}
+      td #{collection.version}
     tr
       td href
       td: block href
 
+  form(action='http://redbot.org/?')
+    p
+      input(name='uri', value=url, type='hidden')
+      input(type='submit', value='Check with redbot.org')
+
+
   h2 Collection Links
-  if doc.links.length == 0
+  if collection.links.length == 0
     p Collection has no links.
   else
-    each link, i in doc.links
+    each link, i in collection.links
       - var title = link.prompt || link.name
-      - title = title ? ": " + title : ""
+      - title = title ? ': ' + title : ''
       h3 Collection Link ##{i}#{title}
       block link
 
-  a(id="items"): h1: a(href="#items") Items
-  if doc.items.length == 0
+block items
+  // a(id='items'): h1: a(href='#items') Items
+  if collection.items.length == 0
     p Collection has to items.
   else
-    p The feed has #{doc.items.length} items.
-    each item, i in doc.items
-      a(id="item-#{i+1}"): h2: a(href="#item-#{i+1}") Item ##{i+1}
+    // p The feed has #{collection.items.length} items.
+    each item, i in collection.items
+      // a(id='item-#{i+1}'): h2: a(href='#item-#{i+1}') Item ##{i+1}
+      h2 Item ##{i+1}
 
       - var href=item.href
       p href: 
@@ -109,13 +85,26 @@ block data
           block link
 
       h3 Data
-        table
+      dl(class='dl-horizontal')
+        each data in item.data
+          dt #{data.name}
+          dd #{data.value}
+      //
+        table(class='table table-striped table-bordered')
           each data in item.data
             tr
-              td #{data.name}
+              th #{data.name}
               td #{data.value}
+      //
+        div(class='form-horizontal')
+          each data in item.data
+            div(class='control-group')
+              label(class='control-label') #{data.name}
+              div(class='controls')
+                div #{data.value}
 
-  a(id="headers"): h1: a(href="#headers") Headers
+block headers
+  // a(id='headers'): h1: a(href='#headers') Headers
   pre
     table
       each value, key in headers
@@ -123,16 +112,74 @@ block data
           td #{key}:
           td #{value}
 
-  a(id="formatted-body"): h1: a(href="#formatted-body") Formatted body
-  pre= formattedRaw
+block formatted_body
+  // a(id='formatted-body'): h1: a(href='#formatted-body') Formatted body
+  pre= formattedBody
 
-  a(id="body"): h1: a(href="#body") Raw body
-  pre= raw
+block raw_body
+  // a(id='body'): h1: a(href='#body') Raw body
+  pre= rawBody
+
+block tabs
+  div(class='tabbable')
+    ul(class='nav nav-tabs')
+      li(class='active'): a(href='#tab-meta', data-toggle='tab') Meta
+      li: a(href='#tab-items', data-toggle='tab') Items
+      li: a(href='#tab-headers', data-toggle='tab') Headers
+      li: a(href='#tab-formatted-body', data-toggle='tab') Formatted Body
+      li: a(href='#tab-raw-body', data-toggle='tab') Raw Body
+    div(class='tab-content')
+      div(class='tab-pane active', id='tab-meta'): block meta
+      div(class='tab-pane', id='tab-items'): block items
+      div(class='tab-pane', id='tab-headers'): block headers
+      div(class='tab-pane', id='tab-formatted-body'): block formatted_body
+      div(class='tab-pane', id='tab-raw-body'): block raw_body
+
+block navbar
+  div(class='navbar navbar-fixed-top')
+    div(class='navbar-inner')
+      div(class='container')
+        a(class='btn btn-navbar', data-toggle='collapse', data-target='.nav-collapse')
+          span(class='icon-bar')
+          span(class='icon-bar')
+          span(class='icon-bar')
+          span(class='icon-bar')
+          span(class='icon-bar')
+        a(class='brand', href='#') Collection+JSON Explorer
+        div(class='nav-collapse')
+          ul(class='nav')
+            li(class='active'): a(href='#meta') Meta
+            li: a(href='#items') Items
+            li: a(href='#headers') Headers
+            li: a(href='#formatted-body') Formatted Body
+            li: a(href='#raw-body') Raw Body
+
 
 block content
-  h1 Collection+JSON Explorer
+  if typeof err != 'undefined'
+    p Error rendering #{url}
 
-  if typeof err == 'undefined'
-    block data
+    p= err
   else
-    block err
+    section(id='meta')
+      div(class='page-header')
+        h1 Meta
+      block meta
+    section(id='items')
+      div(class='page-header')
+        h1 Items 
+          if collection.items.length > 1
+            small #{collection.items.length} items
+      block items
+    section(id='headers')
+      div(class='page-header')
+        h1 Headers
+      block headers
+    section(id='formatted-body')
+      div(class='page-header')
+        h1 Formatted Body
+      block formatted_body
+    section(id='raw-body')
+      div(class='page-header')
+        h1 Raw Body
+      block raw_body

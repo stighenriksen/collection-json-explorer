@@ -5,8 +5,13 @@ html
     meta(name='viewport', content='width=device-width, initial-scale=1.0')
     link(href='/bootstrap-2.0.4/css/bootstrap.css', rel='stylesheet')
     style
-      body {
-        padding-top: 60px; /* 60px to make the container go all the way to the bottom of the topbar */
+      /*
+        body {
+          padding-top: 40px;
+        }
+      */
+      section {
+        padding-top: 40px;
       }
     link(href='/bootstrap-2.0.4/css/bootstrap-responsive.css', rel='stylesheet')
     // Le HTML5 shim, for IE6-8 support of HTML5 elements
@@ -21,6 +26,7 @@ html
       link(rel='apple-touch-icon-precomposed', href='/bootstrap-2.0.4/ico/apple-touch-icon-57-precomposed.png')
 
   body
+    block navbar
     div(class='container')
       block content
       script(src='/javascripts/jquery-1.7.2.min.js')

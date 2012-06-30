@@ -13,15 +13,7 @@ function urlgenerator(req) {
 exports.index = function(req, res){
   res.render('index', {
     title: 'Collection+JSON Explorer',
-    host: req.headers.host,
-    examples: [
-      "minimal",
-      "collection",
-      "item",
-      "queries",
-      "template",
-      "error"
-    ]
+    host: req.headers.host
   });
 };
 
@@ -41,7 +33,7 @@ exports.render = function(req, res) {
       try {
         parsedBody = JSON.parse(body);
       } catch(e) { sendErr('Unable to parse JSON: ' + e); }
-      var doc = collection_json.fromObject(parsedBody).collection;
+      var collection = collection_json.fromObject(parsedBody).collection;
       var isUrl = function(u) {
         try {
           var x = url.parse(u);
@@ -55,10 +47,10 @@ exports.render = function(req, res) {
         isUrl: isUrl,
         urlgenerator: urlgenerator(req),
         url: req.query.url,
-        doc: doc,
+        collection: collection,
         headers: headers,
-        raw: body,
-        formattedRaw: JSON.stringify(parsedBody, null, '  ') });
+        rawBody: body,
+        formattedBody: JSON.stringify(parsedBody, null, '  ') });
     }
   });
 };
