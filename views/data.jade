@@ -90,26 +90,29 @@ block items
           dd #{data.value}
 
 block queries
-  each query in collection.queries
-    - var name = query.prompt || query.name || 'Unnamed query'
-    h2= name
+  if collection.queries.length == 0
+    p Collection has to queries.
+  else
+    each query in collection.queries
+      - var name = query.prompt || query.name || 'Unnamed query'
+      h2= name
 
-    div(class='row')
-      div(class='span12')
-        form(action='/render', class='well form-horizontal')
-          input(type='hidden', name='url', value=query.href)
-          fieldset
-            each data in query.data
-              - var value = params[data.name] || data.value
-              div(class='control-group')
-                label(class='control-label', for=data.name) #{data.name}
-                div(class='controls')
-                  input(type='text', name='param-' + data.name, value=value, class='input-xlarge')
+      div(class='row')
+        div(class='span12')
+          form(action='/render', class='well form-horizontal')
+            input(type='hidden', name='url', value=query.href)
+            fieldset
+              each data in query.data
+                - var value = params[data.name] || data.value
+                div(class='control-group')
+                  label(class='control-label', for=data.name) #{data.name}
+                  div(class='controls')
+                    input(type='text', name='param-' + data.name, value=value, class='input-xlarge')
 
-          div(class='control-group')
-            div(class='controls')
-              input(type='submit') Execute
-              // button(class='execute-query') Execute
+            div(class='control-group')
+              div(class='controls')
+                input(type='submit') Execute
+                // button(class='execute-query') Execute
 
 block headers
   // a(id='headers'): h1: a(href='#headers') Headers
