@@ -66,7 +66,7 @@ block meta
 // TODO: Add ability to show the raw part of the collection.
 block items
   if collection.items.length == 0
-    p Collection has to items.
+    p Collection has no items.
   else
     // p The feed has #{collection.items.length} items.
     each item, i in collection.items
@@ -91,7 +91,7 @@ block items
 
 block queries
   if collection.queries.length == 0
-    p Collection has to queries.
+    p Collection has no queries.
   else
     each query in collection.queries
       - var name = query.prompt || query.name || 'Unnamed query'
@@ -155,6 +155,9 @@ block navbar
 
 block content
   if typeof err != 'undefined'
+    section(id='error')
+      div(class='page-error')
+        h1 Error
     p Error rendering #{url}
 
     p= err

@@ -42,7 +42,10 @@ exports.render = function(req, res) {
       var parsedBody;
       try {
         parsedBody = JSON.parse(body);
-      } catch(e) { sendErr('Unable to parse JSON: ' + e); }
+      } catch(e) {
+        sendErr('Unable to parse JSON: ' + e);
+        return;
+      }
       var collection = collection_json.fromObject(parsedBody).collection;
       var isUrl = function(u) {
         try {
