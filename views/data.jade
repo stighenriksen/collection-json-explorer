@@ -2,56 +2,59 @@ extends layout
 
 block href
   if typeof href != 'string'
-    | &lt;no href>
+    div &lt;no href>
   else
-    span
-      a(href=href) #{href}
-      | 
-      a(href=urlgenerator.render(href)) Explore
+    div #{href} 
 
 block link
   - var name = typeof link.name == 'string' ? link.name : '<no name attribute>'
   - var prompt = typeof link.prompt == 'string' ? link.prompt : '<no prompt attribute>'
   - var href = link.href
-  table
-    tr
-      td href
-      td
-        block href
-    tr
-      td rel
-      td 
-        if isUrl(link.rel)
-          a(href=link.rel) #{link.rel}
-        else
-          | #{link.rel}
-    tr
-      td name
-      td #{name}
-    tr
-      td prompt
-      td #{prompt}
-    if link.render == 'image'
-      tr
-        td
-        td: img(src=link.href, alt=link.name, title=name)
+  div
+    a(class='btn btn-primary btn-mini', href=urlgenerator.render(href)) Explore
+    | 
+    a(class='btn btn-primary btn-mini', href=href) Raw
+
+  dl
+    dt href
+    dd
+      block href
+    dt rel
+    dd 
+      if isUrl(link.rel)
+        a(href=link.rel) #{link.rel}
+      else
+        | #{link.rel}
+    dt name
+    dd #{name}
+    dt prompt
+    dd #{prompt}
+  if link.render == 'image'
+    dt
+    dd: img(src=link.href, alt=link.name, title=name)
 
 block meta
-  - var href=collection.href
-  table
-    tr
-      td version
-      td #{collection.version}
-    tr
-      td href
-      td: block href
+  div(class='row')
+    div(class='span12')
+      p
+        - var href=collection.href
+        dl
+          dt version
+          dd #{collection.version}
+          dt href
+          dd: block href
 
-  form(action='http://redbot.org/?')
-    p
-      input(type='text', name='uri', value=url, type='hidden')
-      input(type='text', name='req_hdr', value='Accept: application/vnd.collection+json', type='hidden')
-      input(type='text', type='submit', value='Check with redbot.org')
-
+  div(class='row')
+    div(class='span12')
+      p
+        a(class='btn btn-primary', href=urlgenerator.render(href)) Explore
+        | 
+        a(class='btn btn-primary', href=href) Raw
+        | 
+        form(action='http://redbot.org')
+          input(type='text', name='uri', value=url, type='hidden')
+          input(type='text', name='req_hdr', value='Accept: application/vnd.collection+json', type='hidden')
+          button(class='btn btn-primary', type='submit') Check with redbot.org
 
   if collection.links.length > 0
     h2 Collection Links
@@ -72,10 +75,15 @@ block items
     each item, i in collection.items
       // a(id='item-#{i+1}'): h2: a(href='#item-#{i+1}') Item ##{i+1}
       h2 Item ##{i+1}
+      div
+        a(class='btn btn-primary btn-mini', href=urlgenerator.render(href)) Explore
+        | 
+        a(class='btn btn-primary btn-mini', href=href) Raw
 
       - var href=item.href
-      p href: 
-        block href
+      dl
+        dt href
+        dd: block href
 
       if item.links.length > 0
         h3 Item Links
