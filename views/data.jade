@@ -4,7 +4,7 @@ block href
   if typeof href != 'string'
     div &lt;no href>
   else
-    div #{href} 
+    div: a(href=urlgenerator.render(href)) #{href} 
 
 block link
   - var name = typeof link.name == 'string' ? link.name : '<no name attribute>'
