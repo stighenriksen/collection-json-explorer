@@ -1,34 +1,68 @@
 extends layout
 
+block navbar
+  div(class='navbar navbar-fixed-top')
+    div(class='navbar-inner')
+      div(class='container')
+        a(class='btn btn-navbar', data-toggle='collapse', data-target='.nav-collapse')
+          span(class='icon-bar')
+        a(class='brand', href='/') Collection+JSON Explorer
+        div(class='nav-collapse')
+          ul(class='nav')
+
 block content
-  h1= title
+  div(class='hero-unit')
+    h1= title
 
-  form(action='/render', class='well')
+    // spacers
+    div(class='row') &nbsp;
+    div(class='row') &nbsp;
+
     div(class='row')
-      div(class='span10')
-        input(type='text', name='url', size='100', placeholder='Enter URL to explore...', class='span10')
-    // TODO: Fix
-    div(class='row')
-      div(class='span12')
-        &nbsp;
-    div(class='row')
-      div(class='offset4 span2')
-        button(type='submit', class='btn') Explore
+      div(class='offset3 span6')
+        form(action='/render', class='form-search')
+          input(type='text', name='url', placeholder='Resource to explore', class='span5')
+          button(type='submit', class='btn') Explore
 
-  p This is a simple/dumb explorer for the 
-    a(href='http://amundsen.com/media-types/collection/') Collection+JSON Hypermedia
-    | .
+    //
+      p
+        form(action='/render', class='form-search')
+          input(type='text', name='url', placeholder='Enter URL to explore...', class='span6')
+          button(type='submit', class='btn') Explore
 
-  h2 Examples
+  div(class='row')
+    div(class='span6')
+      h2 About
+      p This is an interactive explorer for the Collection+JSON
+        | hypermedia. Give it an URL and it will render is as good as it
+        | can.
 
-  p From the 
-    a(href='http://' + host + '/render?url=http%3A%2F%2Fexample-collection-json-db.herokuapp.com') Example Collection+JSON
-    |  application. Drill down in an employee data set.
+      h3 REST/Collection+JSON Resources
 
-  p From the specification: 
-    - var examples = [ "minimal", "collection", "item", "queries", "template", "error" ]
-      each example, i in examples
-        - var u='http://' + host + '/render?url=' + encodeURIComponent('http://' + host + '/examples/from-spec/' + example + '.collection+json')
-          if i > 0
-            | , 
-          a(href='#{u}') #{example}
+      p There's a growing C+J community that's discussing on the 
+        a(href='https://groups.google.com/forum/#!forum/collectionjson') Google Group
+        | .
+
+      p The 
+        a(href='http://amundsen.com/media-types/collection/') formal specification 
+        | with a tutorial and examples.
+
+    div(class='span6')
+      h2 Examples
+
+      p The 
+        a(href='http://employee.herokuapp.com') Employee 
+        | application is a set of resources with employees and
+        | departments. The application was made specifically for this
+        | explorer. 
+        a(href='http://' + host + '/render?url=http%3A%2F%2Femployee.herokuapp.com') Explore now!
+
+      p The specification contains a few example collections too which you can explore: 
+        - var examples = [ "minimal", "collection", "item", "queries", "template", "error" ]
+          each example, i in examples
+            - var u='http://' + host + '/render?url=' + encodeURIComponent('http://' + host + '/examples/from-spec/' + example + '.collection+json')
+              if i > 0
+                | , 
+              a(href='#{u}') #{example}
+              if i == examples.length - 1
+                |.
