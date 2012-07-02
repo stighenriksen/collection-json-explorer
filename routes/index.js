@@ -1,6 +1,7 @@
-var http = require('http')
+var collection_json = require('collection_json')
+  , http = require('http')
   , url = require('url')
-  , collection_json = require('collection_json');
+  , _ = require('underscore');
 
 function urlgenerator(req) {
   var host = req.headers.host;
@@ -24,7 +25,16 @@ exports.render = function(req, res) {
       err: err
     });
   }
-  fetchCollection(req.query.url, function(err, headers, body) {
+  var u = url.parse(req.query.url, true);
+  var params = _.reduce(req.query, function(q, value, key) {
+      if(!key.match(/^param-/)) {
+        return q;
+      }
+      q[key.substr(6)] = value;
+      return q;
+  }, {});
+  u.query = _.extend({}, u.query, params);
+  fetchCollection(url.format(u), function(err, headers, body) {
     if(err) {
       sendErr(err);
     }
@@ -47,6 +57,7 @@ exports.render = function(req, res) {
         isUrl: isUrl,
         urlgenerator: urlgenerator(req),
         url: req.query.url,
+        params: params,
         collection: collection,
         headers: headers,
         rawBody: body,
