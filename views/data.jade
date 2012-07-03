@@ -127,7 +127,6 @@ block queries
             div(class='control-group')
               div(class='controls')
                 input(type='submit') Execute
-                // button(class='execute-query') Execute
 
 block headers
   pre
@@ -136,12 +135,6 @@ block headers
         tr
           td #{key}:
           td #{value}
-
-block formatted_body
-  pre= formattedBody
-
-block raw_body
-  pre= rawBody
 
 block navbar
   div(class='navbar navbar-fixed-top')
@@ -169,29 +162,37 @@ block navbar
 block sidebar
   div(id='navbar', class='sidebar-nav sidebar-nav-fixed')
     ul(class='nav nav-list')
-      li(class='nav-header'): a(href='#meta') Meta
-      each link, i in collection.links
-        li: a(href='#link-' + (i + 1))
-          mixin get_name(link, 'Link', i)
-      li(class='nav-header'): a(href='#items') Items
-      each item, i in collection.items
-        li: a(href='#item-' + (i + 1)) ##{i + 1}
-      li(class='nav-header'): a(href='#queries') Queries
-      each query, i in collection.queries
-        li: a(href='#query-' + (i + 1))
-          mixin get_name(query, 'Query', i)
-      li(class='nav-header'): a(href='#headers') Headers
-      li(class='nav-header'): a(href='#formatted-body') Formatted Body
-      li(class='nav-header'): a(href='#raw-body') Raw Body
+      if typeof err != 'undefined'
+        li(class='nav-header'): a(href='#error') Error
+        li(class='nav-header'): a(href='#raw-body') Raw Body
+      else
+        li(class='nav-header'): a(href='#meta') Meta
+        each link, i in collection.links
+          li: a(href='#link-' + (i + 1))
+            mixin get_name(link, 'Link', i)
+        li(class='nav-header'): a(href='#items') Items
+        each item, i in collection.items
+          li: a(href='#item-' + (i + 1)) ##{i + 1}
+        li(class='nav-header'): a(href='#queries') Queries
+        each query, i in collection.queries
+          li: a(href='#query-' + (i + 1))
+            mixin get_name(query, 'Query', i)
+        li(class='nav-header'): a(href='#headers') Headers
+        li(class='nav-header'): a(href='#formatted-body') Formatted Body
+        li(class='nav-header'): a(href='#raw-body') Raw Body
 
 block inner_content
   if typeof err != 'undefined'
     section(id='error')
       div(class='page-error')
         h1 Error
-    p Error rendering #{url}
+        p Error rendering #{url}
 
-    p= err
+        p= err
+    section(id='raw-body')
+      div(class='page-header')
+        h1 Raw Body
+        pre= rawBody
   else
     section(id='meta')
       div(class='page-header')
@@ -214,15 +215,16 @@ block inner_content
     section(id='formatted-body')
       div(class='page-header')
         h1 Formatted Body
-      block formatted_body
+        pre= formattedBody
     section(id='raw-body')
       div(class='page-header')
         h1 Raw Body
-      block raw_body
+        pre= rawBody
 
 block content
   div(class='row-fluid')
     div(class='span3')
       block sidebar
     div(class='span9')
+      - console.log('fuck')
       block inner_content

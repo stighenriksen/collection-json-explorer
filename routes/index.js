@@ -18,10 +18,11 @@ exports.index = function(req, res){
 };
 
 exports.render = function(req, res) {
-  function sendErr(err) {
+  function sendErr(err, rawBody) {
     res.render('data', {
       url: req.query.url,
-      err: err
+      err: err,
+      rawBody: rawBody
     });
   }
   var u = url.parse(req.query.url, true);
@@ -35,17 +36,18 @@ exports.render = function(req, res) {
   u.query = _.extend({}, u.query, params);
   fetchCollection(url.format(u), function(err, headers, body) {
     if(err) {
-      sendErr(err);
+      sendErr(err, body);
     }
     else {
       var parsedBody;
       try {
         parsedBody = JSON.parse(body);
       } catch(e) {
-        sendErr('Unable to parse JSON: ' + e);
+        sendErr('Unable to parse JSON: ' + e, body);
         return;
       }
       var collection = collection_json.fromObject(parsedBody).collection;
+      console.log(collection);
       var isUrl = function(u) {
         try {
           var x = url.parse(u);
