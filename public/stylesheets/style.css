@@ -1,8 +1,25 @@
-body {
-  padding: 50px;
-  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+.sidebar-nav {
+  padding: 9px 0;
 }
 
-a {
-  color: #00B7FF;
+.sidebar-nav-fixed {
+  position:fixed;
+  /* Only used with top, static navbar
+   top:60px; */
+  top:20px;
+  width:21.97%;
 }
+
+@media (max-width: 767px) {
+  .sidebar-nav-fixed {
+    width:auto;
+  }
+}
+
+@media (max-width: 979px) {
+  .sidebar-nav-fixed {
+    position:static;
+    width: auto;
+  }
+}
+

@@ -1,5 +1,11 @@
 extends layout
 
+mixin get_name(link, prefix, i)
+  - var name = typeof link.name == 'string' ? link.name : undefined
+  - var prompt = typeof link.prompt == 'string' ? link.prompt : undefined
+  - var prefix = typeof prefix == 'string' ? prefix + ': ' : ''
+  |#{prefix + (name || prompt || '#' + i)}
+
 block href
   if typeof href != 'string'
     div &lt;no href>
@@ -36,7 +42,7 @@ block link
     dd: img(src=link.href, alt=link.name, title=name)
 
 block meta
-  div(class='row')
+  div(class='row-fluid')
     div(class='span12')
       p
         - var href=collection.href
@@ -46,7 +52,7 @@ block meta
           dt href
           dd: block href
 
-  div(class='row')
+  div(class='row-fluid')
     div(class='span12')
       p
         a(class='btn btn-primary', href=urlgenerator.render(href)) Explore
@@ -63,7 +69,7 @@ block meta
     each link, i in collection.links
       - var title = link.prompt || link.name
       - title = title ? ': ' + title : ''
-      h3 Collection Link ##{i}#{title}
+      h3(id='link-#{i + 1}') Collection Link ##{i}#{title}
       block link
 
 // TODO: If the collection has prev/next links, add buttons to
@@ -75,8 +81,7 @@ block items
   else
     // p The feed has #{collection.items.length} items.
     each item, i in collection.items
-      // a(id='item-#{i+1}'): h2: a(href='#item-#{i+1}') Item ##{i+1}
-      h2 Item ##{i+1}
+      h2(id='item-#{i+1}') Item ##{i+1}
       div
         a(class='btn btn-primary btn-mini', href=urlgenerator.render(href)) Explore
         | 
@@ -103,11 +108,11 @@ block queries
   if collection.queries.length == 0
     p Collection has no queries.
   else
-    each query in collection.queries
+    each query, i in collection.queries
       - var name = query.prompt || query.name || 'Unnamed query'
-      h2= name
+      h2(id='query-#{i + 1}')= name
 
-      div(class='row')
+      div(class='row-fluid')
         div(class='span12')
           form(action='/render', class='well form-horizontal')
             input(type='hidden', name='url', value=query.href)
@@ -125,7 +130,6 @@ block queries
                 // button(class='execute-query') Execute
 
 block headers
-  // a(id='headers'): h1: a(href='#headers') Headers
   pre
     table
       each value, key in headers
@@ -134,11 +138,9 @@ block headers
           td #{value}
 
 block formatted_body
-  // a(id='formatted-body'): h1: a(href='#formatted-body') Formatted body
   pre= formattedBody
 
 block raw_body
-  // a(id='body'): h1: a(href='#body') Raw body
   pre= rawBody
 
 block navbar
@@ -147,23 +149,42 @@ block navbar
       div(class='container')
         a(class='btn btn-navbar', data-toggle='collapse', data-target='.nav-collapse')
           span(class='icon-bar')
-          span(class='icon-bar')
-          span(class='icon-bar')
-          span(class='icon-bar')
-          span(class='icon-bar')
-          span(class='icon-bar')
+          //
+            span(class='icon-bar')
+            span(class='icon-bar')
+            span(class='icon-bar')
+            span(class='icon-bar')
+            span(class='icon-bar')
         a(class='brand', href='/') Collection+JSON Explorer
         div(class='nav-collapse')
           ul(class='nav')
-            li(class='active'): a(href='#meta') Meta
-            li: a(href='#items') Items
-            li: a(href='#queries') Queries
-            li: a(href='#headers') Headers
-            li: a(href='#formatted-body') Formatted Body
-            li: a(href='#raw-body') Raw Body
+            //
+              li(class='active'): a(href='#meta') Meta
+              li: a(href='#items') Items
+              li: a(href='#queries') Queries
+              li: a(href='#headers') Headers
+              li: a(href='#formatted-body') Formatted Body
+              li: a(href='#raw-body') Raw Body
 
+block sidebar
+  div(id='navbar', class='sidebar-nav sidebar-nav-fixed')
+    ul(class='nav nav-list')
+      li(class='nav-header'): a(href='#meta') Meta
+      each link, i in collection.links
+        li: a(href='#link-' + (i + 1))
+          mixin get_name(link, 'Link', i)
+      li(class='nav-header'): a(href='#items') Items
+      each item, i in collection.items
+        li: a(href='#item-' + (i + 1)) ##{i + 1}
+      li(class='nav-header'): a(href='#queries') Queries
+      each query, i in collection.queries
+        li: a(href='#query-' + (i + 1))
+          mixin get_name(query, 'Query', i)
+      li(class='nav-header'): a(href='#headers') Headers
+      li(class='nav-header'): a(href='#formatted-body') Formatted Body
+      li(class='nav-header'): a(href='#raw-body') Raw Body
 
-block content
+block inner_content
   if typeof err != 'undefined'
     section(id='error')
       div(class='page-error')
@@ -198,3 +219,10 @@ block content
       div(class='page-header')
         h1 Raw Body
       block raw_body
+
+block content
+  div(class='row-fluid')
+    div(class='span3')
+      block sidebar
+    div(class='span9')
+      block inner_content

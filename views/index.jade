@@ -10,27 +10,26 @@ block navbar
         div(class='nav-collapse')
           ul(class='nav')
 
-block content
+block inner_content
   div(class='hero-unit')
     h1= title
 
     // spacers
-    div(class='row') &nbsp;
-    div(class='row') &nbsp;
+    div(class='row-fluid') &nbsp;
+    div(class='row-fluid') &nbsp;
 
-    div(class='row')
-      div(class='offset3 span6')
+    div(class='row-fluid')
+      div(class='span10 input-append')
         form(action='/render', class='form-search')
-          input(type='text', name='url', placeholder='Resource to explore', class='span5')
-          button(type='submit', class='btn') Explore
-
+          input(type='text', name='url', placeholder='Resource to explore', class='span10')
+          button(type='submit', class='btn btn-primary') Explore
     //
       p
         form(action='/render', class='form-search')
           input(type='text', name='url', placeholder='Enter URL to explore...', class='span6')
           button(type='submit', class='btn') Explore
 
-  div(class='row')
+  div(class='row-fluid')
     div(class='span4')
       h2 About
       p This is an interactive explorer for the Collection+JSON
@@ -84,3 +83,7 @@ block content
               a(href='#{u}') #{example}
               if i == examples.length - 1
                 |.
+
+block content
+  div(class='offset2 span10')
+    block inner_content

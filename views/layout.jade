@@ -4,21 +4,24 @@ html
     title Collection+JSON Explorer
     meta(name='viewport', content='width=device-width, initial-scale=1.0')
     link(href='/bootstrap-2.0.4/css/bootstrap.css', rel='stylesheet')
+    link(href='/bootstrap-2.0.4/css/bootstrap-responsive.css', rel='stylesheet')
+    link(href='/stylesheets/style.css', rel='stylesheet')
     style
-      .hero-unit {
-        margin-top: 60px;
-      }
-      section {
+      /*
+      body {
         padding-top: 40px;
       }
+      */
 
     link(href='/bootstrap-2.0.4/css/bootstrap-responsive.css', rel='stylesheet')
     // if lt IE 9
       script(src='http://html5shim.googlecode.com/svn/trunk/html5.js')
 
-  body
-    block navbar
-    div(class='container')
+  body(data-spy='scroll')
+    // block navbar
+    div(class='container-fluid')
       block content
-      script(src='/javascripts/jquery-1.7.2.min.js')
-      script(src='/bootstrap-2.0.4/js/bootstrap.min.js')
+
+    script(src='/javascripts/jquery-1.7.2.min.js')
+    script(src='/javascripts/gui.js')
+    script(src='/bootstrap-2.0.4/js/bootstrap.min.js')

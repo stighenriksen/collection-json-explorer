@@ -1,0 +1,3 @@
+* Add a link to download as CSV.
+* Check if a navigation menu on the left hand side is useful. See
+  http://twitter.github.com/bootstrap/examples/fluid.html
