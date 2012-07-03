@@ -13,7 +13,6 @@ function urlgenerator(req) {
 
 exports.index = function(req, res){
   res.render('index', {
-    title: 'Collection+JSON Explorer',
     host: req.headers.host
   });
 };

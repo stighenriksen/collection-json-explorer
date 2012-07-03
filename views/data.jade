@@ -201,7 +201,7 @@ block inner_content
       div(class='page-header')
         h1 Items 
           if collection.items.length > 1
-            small #{collection.items.length} items
+            span(class='badge') #{collection.items.length}
       block items
     section(id='queries')
       div(class='page-header')

@@ -12,22 +12,17 @@ block navbar
 
 block inner_content
   div(class='hero-unit')
-    h1= title
+    h1 &#x2764; Collection+JSON &#x2764;
 
     // spacers
     div(class='row-fluid') &nbsp;
     div(class='row-fluid') &nbsp;
 
     div(class='row-fluid')
-      div(class='span10 input-append')
+      div(class='span12 input-append')
         form(action='/render', class='form-search')
-          input(type='text', name='url', placeholder='Resource to explore', class='span10')
+          input(type='text', name='url', placeholder='Resource to explore', class='span11')
           button(type='submit', class='btn btn-primary') Explore
-    //
-      p
-        form(action='/render', class='form-search')
-          input(type='text', name='url', placeholder='Enter URL to explore...', class='span6')
-          button(type='submit', class='btn') Explore
 
   div(class='row-fluid')
     div(class='span4')
@@ -44,15 +39,15 @@ block inner_content
         | only the generic Collection+JSON specification and not
         | knowing anything about your application.
 
-      h3 REST/Collection+JSON Resources
+      h3 See also
 
       p There's a growing C+J community that's discussing on the 
         a(href='https://groups.google.com/forum/#!forum/collectionjson') Google Group
         | .
 
-      p The 
-        a(href='http://amundsen.com/media-types/collection/') formal specification 
-        | with a tutorial and examples.
+      p Reading the (quite light) 
+        a(href='http://amundsen.com/media-types/collection/') formal specification
+        |  is useful. It also has a tutorial and some examples.
 
     div(class='span4')
       h2 Using
@@ -79,8 +74,8 @@ block inner_content
         a(href='http://employee.herokuapp.com') Employee 
         |application is a set of resources with employees and
         |departments. The application was made specifically for this
-        |explorer. 
-        a(href='http://' + host + '/render?url=http%3A%2F%2Femployee.herokuapp.com') Explore now!
+        |explorer: 
+        a(href='http://' + host + '/render?url=http%3A%2F%2Femployee.herokuapp.com', class='label label-info') explore now!
 
       p The specification contains a few example collections too which you can explore: 
         - var examples = [ "minimal", "collection", "item", "queries", "template", "error" ]
