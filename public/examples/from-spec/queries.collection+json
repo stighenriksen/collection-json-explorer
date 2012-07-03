@@ -4,7 +4,7 @@
     "href" : "http://example.org/friends/",
     
     "queries" : [
-      {"rel" : "search", "href" : "http://example.org/friends/search", "prompt" : "Search"
+      {"rel" : "search", "href" : "http://example.org/friends/search", "prompt" : "Search",
         "data" : [
           {"name" : "search", "value" : ""}
         ]
