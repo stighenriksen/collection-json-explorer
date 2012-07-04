@@ -18,10 +18,14 @@ exports.index = function(req, res){
 };
 
 exports.render = function(req, res) {
-  function sendErr(err, rawBody) {
+  function sendErr(req, err, statusCode, status, headers, rawBody) {
     res.render('data', {
+      urlgenerator: urlgenerator(req),
       url: req.query.url,
       err: err,
+      statusCode: statusCode,
+      status: status,
+      headers: headers,
       rawBody: rawBody
     });
   }
@@ -34,39 +38,41 @@ exports.render = function(req, res) {
       return q;
   }, {});
   u.query = _.extend({}, u.query, params);
-  fetchCollection(url.format(u), function(err, headers, body) {
+  fetchCollection(url.format(u), function(err, statusCode, status, headers, body) {
     if(err) {
-      sendErr(err, body);
+      sendErr(req, err, statusCode, status, headers, body);
+      return;
     }
-    else {
-      var parsedBody;
+    var parsedBody;
+    try {
+      parsedBody = JSON.parse(body);
+    } catch(e) {
+      sendErr(req, 'Unable to parse JSON: ' + e, statusCode, status, headers, body);
+      return;
+    }
+    var collection = collection_json.fromObject(parsedBody).collection;
+    var isUrl = function(u) {
       try {
-        parsedBody = JSON.parse(body);
-      } catch(e) {
-        sendErr('Unable to parse JSON: ' + e, body);
-        return;
+        var x = url.parse(u);
+        return _.isString(x.protocol) && _.isString(x.host) && _.isString(path);
       }
-      var collection = collection_json.fromObject(parsedBody).collection;
-      console.log(collection);
-      var isUrl = function(u) {
-        try {
-          var x = url.parse(u);
-          return _.isString(x.protocol) && _.isString(x.host) && _.isString(path);
-        }
-        catch(e) {
-          return false;
-        }
-      };
-      res.render('data', {
-        isUrl: isUrl,
-        urlgenerator: urlgenerator(req),
-        url: req.query.url,
-        params: params,
-        collection: collection,
-        headers: headers,
-        rawBody: body,
-        formattedBody: JSON.stringify(parsedBody, null, '  ') });
-    }
+      catch(e) {
+        return false;
+      }
+    };
+    res.render('data', {
+      isUrl: isUrl,
+      urlgenerator: urlgenerator(req),
+      url: req.query.url,
+      params: params,
+      collection: collection,
+      statusCode: statusCode,
+      status: status,
+      headers: headers,
+      headers: headers,
+      rawBody: body,
+      formattedBody: JSON.stringify(parsedBody, null, '  ')
+    });
   });
 };
 
@@ -82,7 +88,7 @@ function fetchCollection(u, cb) {
       body += chunk;
     });
     res.on('end', function (chunk) {
-      cb(undefined, res.headers, body);
+      cb(undefined, res.stausCode, "", res.headers, body);
     });
   }).on('error', function() {
     cb('Unable to fetch ' + u);

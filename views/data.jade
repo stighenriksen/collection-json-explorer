@@ -128,13 +128,16 @@ block queries
               div(class='controls')
                 input(type='submit') Execute
 
-block headers
-  pre
-    table
-      each value, key in headers
-        tr
-          td #{key}:
-          td #{value}
+block http_response
+  div(class='row-fluid')
+    pre
+      table
+        each value, key in headers
+          tr
+            td #{key}:
+            td #{value}
+      | 
+      | #{rawBody}
 
 block navbar
   div(class='navbar navbar-fixed-top')
@@ -164,7 +167,6 @@ block sidebar
     ul(class='nav nav-list')
       if typeof err != 'undefined'
         li(class='nav-header'): a(href='#error') Error
-        li(class='nav-header'): a(href='#raw-body') Raw Body
       else
         li(class='nav-header'): a(href='#meta') Meta
         each link, i in collection.links
@@ -177,22 +179,19 @@ block sidebar
         each query, i in collection.queries
           li: a(href='#query-' + (i + 1))
             mixin get_name(query, 'Query', i)
-        li(class='nav-header'): a(href='#headers') Headers
         li(class='nav-header'): a(href='#formatted-body') Formatted Body
-        li(class='nav-header'): a(href='#raw-body') Raw Body
+      li(class='nav-header'): a(href='#http-response') HTTP Response
 
 block inner_content
   if typeof err != 'undefined'
     section(id='error')
-      div(class='page-error')
+      div(class='page-header')
         h1 Error
-        p Error rendering #{url}
+      div(class='row-fluid')
+        p Error rendering: #{url} 
+          a(class='btn btn-primary btn-mini', href=urlgenerator.render(url)) Retry
 
         p= err
-    section(id='raw-body')
-      div(class='page-header')
-        h1 Raw Body
-        pre= rawBody
   else
     section(id='meta')
       div(class='page-header')
@@ -208,23 +207,19 @@ block inner_content
       div(class='page-header')
         h1 Queries
       block queries
-    section(id='headers')
-      div(class='page-header')
-        h1 Headers
-      block headers
     section(id='formatted-body')
       div(class='page-header')
         h1 Formatted Body
         pre= formattedBody
-    section(id='raw-body')
-      div(class='page-header')
-        h1 Raw Body
-        pre= rawBody
+
+  section(id='http-response')
+    div(class='page-header')
+      h1 HTTP Response
+    block http_response
 
 block content
   div(class='row-fluid')
     div(class='span3')
       block sidebar
     div(class='span9')
-      - console.log('fuck')
       block inner_content

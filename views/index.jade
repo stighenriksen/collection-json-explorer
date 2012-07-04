@@ -64,7 +64,7 @@ block inner_content
       h3 The Source Code
 
       p The source code is available 
-        a(href='trygvis.dyndns.org/~trygvis/git/2012/06/collection+json-explorer.git') here
+        a(href='http://trygvis.dyndns.org/~trygvis/git/2012/06/collection+json-explorer.git') here
         | .
 
     div(class='span4')
@@ -77,7 +77,8 @@ block inner_content
         |explorer: 
         a(href='http://' + host + '/render?url=http%3A%2F%2Femployee.herokuapp.com', class='label label-info') explore now!
 
-      p The specification contains a few example collections too which you can explore: 
+      p The specification contains a few example collections too which
+        | you can explore: 
         - var examples = [ "minimal", "collection", "item", "queries", "template", "error" ]
           each example, i in examples
             - var u='http://' + host + '/render?url=' + encodeURIComponent('http://' + host + '/examples/from-spec/' + example + '.collection+json')
