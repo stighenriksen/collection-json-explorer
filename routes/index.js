@@ -86,12 +86,11 @@ exports.render = function(req, res) {
       sendErr(req, res, 'Unable to parse JSON: ' + e, httpResponse);
       return;
     }
-    var collection = collection_json.fromObject(parsedBody).collection;
     res.render('data', {
       urlgenerator: urlgenerator(req),
       url: req.query.url, referer: req.query.referer,
       params: params,
-      collection: collection,
+      root: collection_json.fromObject(parsedBody),
       httpResponse: httpResponse,
       formattedBody: JSON.stringify(parsedBody, null, '  ')
     });

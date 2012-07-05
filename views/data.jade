@@ -74,6 +74,18 @@ block meta
       h3(id='link-#{i + 1}') Collection Link ##{i}#{title}
       block link
 
+block next_prev
+  - var next = root.findLinkByRel('next');
+  - var prev = root.findLinkByRel('prev');
+  if next || prev
+    div(class='fluid-row')
+      div(class='span12')
+        if prev
+          a(class='btn btn-primary btn-mini', href=urlgenerator.render(next.href) + '#items') Previous
+          | 
+        if next
+          a(class='btn btn-primary btn-mini', href=urlgenerator.render(next.href) + '#items') Next
+
 // TODO: If the collection has prev/next links, add buttons to
 // automaticaly navigate those.
 // TODO: Add ability to show the raw part of the collection.
@@ -81,7 +93,8 @@ block items
   if collection.items.length == 0
     p Collection has no items.
   else
-    // p The feed has #{collection.items.length} items.
+    block next_prev
+
     each item, i in collection.items
       - var href=item.href
       h2(id='item-#{i+1}') Item ##{i+1}
@@ -110,6 +123,8 @@ block items
         each data in item.data
           dt #{data.name}
           dd #{data.value}
+
+    block next_prev
 
 block queries
   if collection.queries.length == 0
@@ -247,6 +262,8 @@ block inner_content
         h1 Items 
           if collection.items.length > 1
             span(class='badge') #{collection.items.length}
+              if root.findLinkByRel('next')
+                |+
       block items
     section(id='queries')
       div(class='page-header')
@@ -270,6 +287,7 @@ block inner_content
       block httpResponse
 
 block content
+  - var collection = root.collection
   div(class='row-fluid')
     div(class='span3')
       block sidebar
