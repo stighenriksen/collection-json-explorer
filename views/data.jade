@@ -217,10 +217,10 @@ block sidebar
         each item, i in collection.items
           li: a(href='#item-' + (i + 1)) ##{i + 1}
         li(class='nav-header'): a(href='#queries') Queries
-        li(class='nav-header'): a(href='#error') Error
         each query, i in collection.queries
           li: a(href='#query-' + (i + 1))
             mixin get_name(query, 'Query', i)
+        li(class='nav-header'): a(href='#error') Error
         li(class='nav-header'): a(href='#formatted-body') Formatted Body
 
       if typeof httpResponse != 'undefined'
