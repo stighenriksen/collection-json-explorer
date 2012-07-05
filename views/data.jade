@@ -29,7 +29,7 @@ block link
       block href
     dt rel
     dd 
-      if isUrl(link.rel)
+      if urlgenerator.isUrl(link.rel)
         a(href=link.rel) #{link.rel}
       else
         | #{link.rel}
@@ -44,21 +44,23 @@ block link
 block meta
   div(class='row-fluid')
     div(class='span12')
-      p
-        - var href=collection.href
-        dl
-          dt version
-          dd #{collection.version}
-          dt href
-          dd: block href
+      - var href=collection.href
+      dl
+        dt version
+        dd #{collection.version}
+        dt href
+        dd: block href
 
   div(class='row-fluid')
     div(class='span12')
       p
-        a(class='btn btn-primary', href=urlgenerator.render(href)) Explore
-        | 
-        a(class='btn btn-primary', href=href) Raw
-        | 
+        if href
+          a(class='btn btn-primary', href=urlgenerator.render(href)) Explore
+          | 
+          a(class='btn btn-primary', href=href) Raw
+          | 
+          a(class='btn btn-danger', href=urlgenerator.delete(url, href)) Delete
+          | 
         form(action='http://redbot.org')
           input(type='text', name='uri', value=url, type='hidden')
           input(type='text', name='req_hdr', value='Accept: application/vnd.collection+json', type='hidden')
@@ -81,13 +83,18 @@ block items
   else
     // p The feed has #{collection.items.length} items.
     each item, i in collection.items
-      h2(id='item-#{i+1}') Item ##{i+1}
-      div
-        a(class='btn btn-primary btn-mini', href=urlgenerator.render(href)) Explore
-        | 
-        a(class='btn btn-primary btn-mini', href=href) Raw
-
       - var href=item.href
+      h2(id='item-#{i+1}') Item ##{i+1}
+      if href
+        div(class='fluid-row')
+          div(class='span12')
+            p
+              a(class='btn btn-primary btn-mini', href=urlgenerator.render(href)) Explore
+              | 
+              a(class='btn btn-primary btn-mini', href=href) Raw
+              | 
+              a(class='btn btn-danger btn-mini', href=urlgenerator.delete(url, href)) Delete
+
       dl
         dt href
         dd: block href
@@ -128,16 +135,49 @@ block queries
               div(class='controls')
                 input(type='submit') Execute
 
-block http_response
+block error
   div(class='row-fluid')
+    if typeof collection.error == 'undefined'
+      p Collection didn't include an error condition.
+    else
+      dl
+        dt title
+        dd
+          if collection.error.title
+            | #{collection.error.title}
+          else
+            i No title
+        dt code
+        dd
+          if collection.error.code
+            | #{collection.error.code}
+          else
+            i No code
+        dt message
+        dd
+          if collection.error.message
+            | #{collection.error.message}
+          else
+            i No message
+
+block httpResponse
+  div(class='row-fluid')
+    dl
+      dt URL
+      dd: a(href=urlgenerator.render(url)) #{url}
+      if typeof referer != 'undefined'
+        dt Referer
+        dd: a(href=urlgenerator.render(referer)) #{referer}
     pre
       table
-        each value, key in headers
+        tr
+          td(colspan='2') #{httpResponse.statusCode} #{httpResponse.status}
+        each value, key in httpResponse.headers
           tr
             td #{key}:
             td #{value}
       | 
-      | #{rawBody}
+      | #{httpResponse.body}
 
 block navbar
   div(class='navbar navbar-fixed-top')
@@ -166,9 +206,10 @@ block sidebar
   div(id='navbar', class='sidebar-nav sidebar-nav-fixed')
     ul(class='nav nav-list')
       if typeof err != 'undefined'
-        li(class='nav-header'): a(href='#error') Error
-      else
-        li(class='nav-header'): a(href='#meta') Meta
+        li(class='nav-header'): a(href='#server-error') Server Error
+
+      if typeof collection != 'undefined'
+        li(class='nav-header active'): a(href='#meta') Meta
         each link, i in collection.links
           li: a(href='#link-' + (i + 1))
             mixin get_name(link, 'Link', i)
@@ -176,23 +217,27 @@ block sidebar
         each item, i in collection.items
           li: a(href='#item-' + (i + 1)) ##{i + 1}
         li(class='nav-header'): a(href='#queries') Queries
+        li(class='nav-header'): a(href='#error') Error
         each query, i in collection.queries
           li: a(href='#query-' + (i + 1))
             mixin get_name(query, 'Query', i)
         li(class='nav-header'): a(href='#formatted-body') Formatted Body
-      li(class='nav-header'): a(href='#http-response') HTTP Response
+
+      if typeof httpResponse != 'undefined'
+        li(class='nav-header'): a(href='#http-response') HTTP Response
 
 block inner_content
   if typeof err != 'undefined'
-    section(id='error')
+    section(id='server-error')
       div(class='page-header')
-        h1 Error
+        h1 Server Error
       div(class='row-fluid')
         p Error rendering: #{url} 
           a(class='btn btn-primary btn-mini', href=urlgenerator.render(url)) Retry
 
         p= err
-  else
+
+  if typeof collection != 'undefined'
     section(id='meta')
       div(class='page-header')
         h1 Meta
@@ -207,15 +252,22 @@ block inner_content
       div(class='page-header')
         h1 Queries
       block queries
+    section(id='error')
+      div(class='page-header')
+        h1 Error
+      block error
     section(id='formatted-body')
       div(class='page-header')
         h1 Formatted Body
-        pre= formattedBody
+      div(class='row-fluid')
+        div(class='span12')
+          pre= formattedBody
 
-  section(id='http-response')
-    div(class='page-header')
-      h1 HTTP Response
-    block http_response
+  if typeof httpResponse != 'undefined'
+    section(id='http-response')
+      div(class='page-header')
+        h1 HTTP Response
+      block httpResponse
 
 block content
   div(class='row-fluid')

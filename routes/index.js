@@ -1,34 +1,70 @@
 var collection_json = require('collection_json')
   , http = require('http')
   , url = require('url')
+  , util = require('util')
   , _ = require('underscore');
 
 function urlgenerator(req) {
   var host = req.headers.host;
   return {
-    render: function(u) {
-      return 'http://' + host + '/render?url=' + encodeURIComponent(u)}
+    render: function(u) { return 'http://' + host + '/render?url=' + encodeURIComponent(u)},
+    delete: function(referer, u) { return 'http://' + host + '/delete?referer=' + encodeURIComponent(referer) + '&url=' + encodeURIComponent(u)},
+    isUrl: function(u) {
+      try {
+        var x = url.parse(u);
+        return _.isString(x.protocol) && _.isString(x.host) && _.isString(path);
+      }
+      catch(e) {
+        return false;
+      }
+    }
   };
 }
 
-exports.index = function(req, res){
+function sendErr(req, res, err, httpResponse) {
+  res.render('data', {
+    urlgenerator: urlgenerator(req),
+    url: req.query.url, referer: req.query.referer,
+    err: err,
+    httpResponse: httpResponse
+  });
+}
+
+exports.index = function(req, res) {
   res.render('index', {
     host: req.headers.host
   });
 };
 
-exports.render = function(req, res) {
-  function sendErr(req, err, statusCode, status, headers, rawBody) {
+exports.delete = function(req, res) {
+  var options = url.parse(req.query.url, false);
+  options.method = 'DELETE';
+  function done(message, httpResponse) {
     res.render('data', {
       urlgenerator: urlgenerator(req),
-      url: req.query.url,
-      err: err,
-      statusCode: statusCode,
-      status: status,
-      headers: headers,
-      rawBody: rawBody
+      url: req.query.url, referer: req.query.referer,
+      httpResponse: httpResponse
     });
   }
+  http.request(options, function(httpResponse) {
+    httpResponse.setEncoding('utf8');
+    var body = '';
+    httpResponse.on('data', function (chunk) {
+      body += chunk;
+    }).on('end', function (chunk) {
+      done(undefined, {
+        statusCode: httpResponse.statusCode,
+        status: '',
+        headers: httpResponse.headers,
+        body: body
+      });
+    });
+  }).on('error', function(e) {
+      done(util.inspect(e));
+  }).end();
+}
+
+exports.render = function(req, res) {
   var u = url.parse(req.query.url, true);
   var params = _.reduce(req.query, function(q, value, key) {
       if(!key.match(/^param-/)) {
@@ -38,39 +74,25 @@ exports.render = function(req, res) {
       return q;
   }, {});
   u.query = _.extend({}, u.query, params);
-  fetchCollection(url.format(u), function(err, statusCode, status, headers, body) {
+  fetchCollection(url.format(u), function(err, httpResponse) {
     if(err) {
-      sendErr(req, err, statusCode, status, headers, body);
+      sendErr(req, res, err, httpResponse);
       return;
     }
     var parsedBody;
     try {
-      parsedBody = JSON.parse(body);
+      parsedBody = JSON.parse(httpResponse.body);
     } catch(e) {
-      sendErr(req, 'Unable to parse JSON: ' + e, statusCode, status, headers, body);
+      sendErr(req, res, 'Unable to parse JSON: ' + e, httpResponse);
       return;
     }
     var collection = collection_json.fromObject(parsedBody).collection;
-    var isUrl = function(u) {
-      try {
-        var x = url.parse(u);
-        return _.isString(x.protocol) && _.isString(x.host) && _.isString(path);
-      }
-      catch(e) {
-        return false;
-      }
-    };
     res.render('data', {
-      isUrl: isUrl,
       urlgenerator: urlgenerator(req),
-      url: req.query.url,
+      url: req.query.url, referer: req.query.referer,
       params: params,
       collection: collection,
-      statusCode: statusCode,
-      status: status,
-      headers: headers,
-      headers: headers,
-      rawBody: body,
+      httpResponse: httpResponse,
       formattedBody: JSON.stringify(parsedBody, null, '  ')
     });
   });
@@ -88,7 +110,12 @@ function fetchCollection(u, cb) {
       body += chunk;
     });
     res.on('end', function (chunk) {
-      cb(undefined, res.stausCode, "", res.headers, body);
+      cb(undefined, {
+        statusCode: res.statusCode,
+        status: '',
+        headers: res.headers,
+        body: body
+      });
     });
   }).on('error', function() {
     cb('Unable to fetch ' + u);
