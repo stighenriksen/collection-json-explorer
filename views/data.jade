@@ -6,13 +6,16 @@ mixin get_name(link, prefix, i)
   - var prefix = typeof prefix == 'string' ? prefix + ': ' : ''
   |#{prefix + (name || prompt || '#' + i)}
 
+// TODO: Show show a 'copy' button to copy the entire link
 block href
   if typeof href != 'string'
     div: i no href
   else
     div
-      a(href=urlgenerator.render(href)) #{href}
-      |  (opens in explorer)
+      - var splits = urlgenerator.split(href)
+      for split in splits
+        a(href=urlgenerator.render(split[1]), title='Explore #{split[1]}') #{split[0]}
+        | 
 
 block link
   - var href = link.href

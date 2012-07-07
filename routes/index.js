@@ -4,9 +4,35 @@ var collection_json = require('collection_json')
   , util = require('util')
   , _ = require('underscore');
 
+function split(str) {
+  var u = url.parse(str);
+
+  var segments = u.pathname.replace(/\/$/, '').split('/');
+
+  var splits = _.map(_.range(segments.length), function(i) {
+    var x = _.clone(u);
+    x.pathname = _.first(segments, i + 1).join('/');
+    x.search = '';
+    if(i == 0) {
+      return [u.protocol + '//' + u.host, url.format(x)];
+    }
+    else {
+      return ['/' + segments[i], url.format(x)];
+    }
+  });
+
+  if(u.search) {
+    splits.push([(u.pathname.match(/\/$/) ? '/' : '') + u.search, url.format(u)]);
+  }
+
+  return splits;
+}
+exports.split = split;
+
 function urlgenerator(req) {
   var host = req.headers.host;
   return {
+    split: split,
     render: function(u) { return 'http://' + host + '/render?url=' + encodeURIComponent(u)},
     delete: function(referer, u) { return 'http://' + host + '/delete?referer=' + encodeURIComponent(referer) + '&url=' + encodeURIComponent(u)},
     isUrl: function(u) {
