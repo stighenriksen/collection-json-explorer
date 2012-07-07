@@ -8,15 +8,13 @@ mixin get_name(link, prefix, i)
 
 block href
   if typeof href != 'string'
-    div &lt;no href>
+    div: i no href
   else
     div
       a(href=urlgenerator.render(href)) #{href}
       |  (opens in explorer)
 
 block link
-  - var name = typeof link.name == 'string' ? link.name : '<no name attribute>'
-  - var prompt = typeof link.prompt == 'string' ? link.prompt : '<no prompt attribute>'
   - var href = link.href
   div
     a(class='btn btn-primary btn-mini', href=urlgenerator.render(href)) Explore
@@ -34,12 +32,20 @@ block link
       else
         | #{link.rel}
     dt name
-    dd #{name}
+    dd
+      if link.name
+        | #{link.name}
+      else
+        i Not set
     dt prompt
-    dd #{prompt}
+    dd
+      if link.prompt
+        | #{link.prompt}
+      else
+        i Not set
   if link.render == 'image'
     dt
-    dd: img(src=link.href, alt=link.name, title=name)
+    dd: img(src=link.href, alt=link.name, title=link.name)
 
 block meta
   div(class='row-fluid')
@@ -47,7 +53,11 @@ block meta
       - var href=collection.href
       dl
         dt version
-        dd #{collection.version}
+        dd
+          if collection.version
+            | #{collection.version}
+          else
+            i Not set
         dt href
         dd: block href
 
@@ -161,19 +171,19 @@ block error
           if collection.error.title
             | #{collection.error.title}
           else
-            i No title
+            i Not set
         dt code
         dd
           if collection.error.code
             | #{collection.error.code}
           else
-            i No code
+            i Not set
         dt message
         dd
           if collection.error.message
             | #{collection.error.message}
           else
-            i No message
+            i Not set
 
 block httpResponse
   div(class='row-fluid')
