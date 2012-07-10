@@ -2,3 +2,17 @@
 * Check if a navigation menu on the left hand side is useful. See
   http://twitter.github.com/bootstrap/examples/fluid.html
 * Handle/follow redirects.
+
+* Allow the application to inline queries and templates. A collection
+  can point to documents that contain queries and templates with link
+  relations, the client should be able to fetch these and inline them.
+
+  Might have to be done on the server side. Should probably make this
+  an optional feature enabled with cookies or something.
+
+Usability
+* For usability for newcomers to C+J consider adding explanatory texts
+  all over the application. Explain where data comes from, why
+  something is missing (missing fields etc). Allow the user close
+  warnings and have the browser remember which warnings has been
+  silenced.

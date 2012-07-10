@@ -87,17 +87,25 @@ block meta
       h3(id='link-#{i + 1}') Collection Link ##{i}#{title}
       block link
 
-block next_prev
+block items_links
+  - var first = root.findLinkByRel('first');
   - var next = root.findLinkByRel('next');
   - var prev = root.findLinkByRel('prev');
-  if next || prev
+  - var last = root.findLinkByRel('last');
+  if first || next || prev || last
     div(class='fluid-row')
       div(class='span12')
+        if first
+          a(class='btn btn-primary btn-mini', href=urlgenerator.render(first.href) + '#items') First
+          | 
         if prev
           a(class='btn btn-primary btn-mini', href=urlgenerator.render(next.href) + '#items') Previous
           | 
         if next
           a(class='btn btn-primary btn-mini', href=urlgenerator.render(next.href) + '#items') Next
+          | 
+        if last
+          a(class='btn btn-primary btn-mini', href=urlgenerator.render(last.href) + '#items') Last
 
 // TODO: If the collection has prev/next links, add buttons to
 // automaticaly navigate those.
@@ -106,7 +114,7 @@ block items
   if collection.items.length == 0
     p Collection has no items.
   else
-    block next_prev
+    block items_links
 
     each item, i in collection.items
       - var href=item.href
@@ -137,7 +145,7 @@ block items
           dt #{data.name}
           dd #{data.value}
 
-    block next_prev
+    block items_links
 
 block queries
   if collection.queries.length == 0
@@ -163,30 +171,52 @@ block queries
               div(class='controls')
                 input(type='submit') Execute
 
+block template
+  div(class='row-fluid')
+    div(class='span12')
+      form(action='/post', method='post', class='well form-horizontal')
+        input(type='hidden', name='url', value=collection.href)
+        fieldset
+          each data in collection.template.data
+            - var value = params[data.name] || data.value
+            div(class='control-group')
+              label(class='control-label', for=data.name)
+                if data.prompt
+                  | #{data.prompt}
+                else
+                  | #{data.name}
+              div(class='controls')
+                input(type='text', name='param-' + data.name, value=value, class='input-xlarge')
+
+        div(class='control-group')
+          div(class='controls')
+            if typeof collection.href == 'undefined'
+              input.btn.btn-primary.disabled(type='submit', disabled) Write
+              p.help-block This collection has a template, but doesn't have a href which is required.
+            else
+              input.btn.btn-primary(type='submit') Write
+
 block error
   div(class='row-fluid')
-    if typeof collection.error == 'undefined'
-      p Collection didn't include an error condition.
-    else
-      dl
-        dt title
-        dd
-          if collection.error.title
-            | #{collection.error.title}
-          else
-            i Not set
-        dt code
-        dd
-          if collection.error.code
-            | #{collection.error.code}
-          else
-            i Not set
-        dt message
-        dd
-          if collection.error.message
-            | #{collection.error.message}
-          else
-            i Not set
+    dl
+      dt title
+      dd
+        if collection.error.title
+          | #{collection.error.title}
+        else
+          i Not set
+      dt code
+      dd
+        if collection.error.code
+          | #{collection.error.code}
+        else
+          i Not set
+      dt message
+      dd
+        if collection.error.message
+          | #{collection.error.message}
+        else
+          i Not set
 
 block httpResponse
   div(class='row-fluid')
@@ -248,7 +278,10 @@ block sidebar
         each query, i in collection.queries
           li: a(href='#query-' + (i + 1))
             mixin get_name(query, 'Query', i)
-        li(class='nav-header'): a(href='#error') Error
+        if typeof collection.template != 'undefined'
+          li(class='nav-header'): a(href='#template') Template
+        if typeof collection.error != 'undefined'
+          li(class='nav-header'): a(href='#error') Error
         li(class='nav-header'): a(href='#formatted-body') Formatted Body
 
       if typeof httpResponse != 'undefined'
@@ -282,10 +315,16 @@ block inner_content
       div(class='page-header')
         h1 Queries
       block queries
-    section(id='error')
-      div(class='page-header')
-        h1 Error
-      block error
+    if typeof collection.template != 'undefined'
+      section(id='template')
+        div(class='page-header')
+          h1 Template
+        block template
+    if typeof collection.error != 'undefined'
+      section(id='error')
+        div(class='page-header')
+          h1 Error
+        block error
     section(id='formatted-body')
       div(class='page-header')
         h1 Formatted Body
