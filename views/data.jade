@@ -7,27 +7,24 @@ mixin get_name(link, prefix, i)
   |#{prefix + (name || prompt || '#' + i)}
 
 // TODO: Show show a 'copy' button to copy the entire link
-block href
+mixin href(href)
   if typeof href != 'string'
-    div: i no href
+    i no href
   else
-    div
-      - var splits = urlgenerator.split(href)
-      for split in splits
-        a(href=urlgenerator.render(split[1]), title='Explore #{split[1]}') #{split[0]}
-        | 
+    - var splits = urlgenerator.split(href)
+    for split in splits
+      a(href=urlgenerator.render(split[1]), title='Explore #{split[1]}') #{split[0]}
+      | 
 
 block link
-  - var href = link.href
   div
-    a(class='btn btn-primary btn-mini', href=urlgenerator.render(href)) Explore
+    a(class='btn btn-primary btn-mini', href=urlgenerator.render(link.href)) Explore
     | 
-    a(class='btn btn-primary btn-mini', href=href) Raw
+    a(class='btn btn-primary btn-mini', href=link.href) Raw
 
   dl
     dt href
-    dd
-      block href
+    dd: div: mixin href(link.href)
     dt rel
     dd 
       if urlgenerator.isUrl(link.rel)
@@ -53,7 +50,6 @@ block link
 block meta
   div(class='row-fluid')
     div(class='span12')
-      - var href=collection.href
       dl
         dt version
         dd
@@ -62,17 +58,17 @@ block meta
           else
             i Not set
         dt href
-        dd: block href
+        dd: div: mixin href(collection.href)
 
   div(class='row-fluid')
     div(class='span12')
       p
-        if href
-          a(class='btn btn-primary', href=urlgenerator.render(href)) Explore
+        if collection.href
+          a(class='btn btn-primary', href=urlgenerator.render(collection.href)) Explore
           | 
-          a(class='btn btn-primary', href=href) Raw
+          a(class='btn btn-primary', href=collection.href) Raw
           | 
-          a(class='btn btn-danger', href=urlgenerator.delete(url, href)) Delete
+          a(class='btn btn-danger', href=urlgenerator.delete(url, collection.href)) Delete
           | 
         form(action='http://redbot.org')
           input(type='text', name='uri', value=url, type='hidden')
@@ -111,90 +107,100 @@ block items_links
 // automaticaly navigate those.
 // TODO: Add ability to show the raw part of the collection.
 block items
-  if collection.items.length == 0
-    p Collection has no items.
-  else
-    block items_links
+  block items_links
 
-    each item, i in collection.items
-      - var href=item.href
-      h2(id='item-#{i+1}') Item ##{i+1}
-      if href
-        div(class='fluid-row')
-          div(class='span12')
-            p
-              a(class='btn btn-primary btn-mini', href=urlgenerator.render(href)) Explore
-              | 
-              a(class='btn btn-primary btn-mini', href=href) Raw
-              | 
-              a(class='btn btn-danger btn-mini', href=urlgenerator.delete(url, href)) Delete
+  each item, i in collection.items
+    h2(id='item-#{i+1}') Item ##{i+1}
+    if item.href
+      div(class='fluid-row')
+        div(class='span12')
+          p
+            a(class='btn btn-primary btn-mini', href=urlgenerator.render(item.href)) Explore
+            | 
+            a(class='btn btn-primary btn-mini', href=item.href) Raw
+            | 
+            a(class='btn btn-danger btn-mini', href=urlgenerator.delete(url, item.href)) Delete
 
-      dl
-        dt href
-        dd: block href
+    dl
+      dt href
+      dd: div: mixin href(item.href)
 
-      if item.links.length > 0
-        h3 Item Links
-        each link, i in item.links
-          h4 Item Link ##{i}
-          block link
+    if item.links.length > 0
+      h3 Item Links
+      each link, i in item.links
+        h4 Item Link ##{i}
+        block link
 
-      h3 Data
-      dl(class='dl-horizontal')
-        each data in item.data
-          dt #{data.name}
-          dd #{data.value}
+    h3 Data
+    dl(class='dl-horizontal')
+      each data in item.data
+        dt #{data.name}
+        dd #{data.value}
 
-    block items_links
+  block items_links
 
 block queries
-  if collection.queries.length == 0
-    p Collection has no queries.
-  else
-    each query, i in collection.queries
-      - var name = query.prompt || query.name || 'Unnamed query'
-      h2(id='query-#{i + 1}')= name
+  each query, i in collection.queries
+    - var name = query.prompt || query.name || 'Unnamed query'
+    h2(id='query-#{i + 1}')= name
 
-      div(class='row-fluid')
-        div(class='span12')
-          form(action='/render', class='well form-horizontal')
-            input(type='hidden', name='url', value=query.href)
-            fieldset
+    div(class='row-fluid')
+      div(class='span12')
+        form.well(action='/render')
+          input(type='hidden', name='url', value=query.href)
+          table.cj-form
+            tbody
               each data in query.data
                 - var value = params[data.name] || data.value
-                div(class='control-group')
-                  label(class='control-label', for=data.name) #{data.name}
-                  div(class='controls')
-                    input(type='text', name='param-' + data.name, value=value, class='input-xlarge')
-
-            div(class='control-group')
-              div(class='controls')
-                input(type='submit') Execute
+                tr
+                  th(title="name: " + data.name)
+                    div
+                      label(for=data.name)
+                        if data.prompt
+                          | #{data.prompt}
+                        else
+                          | #{data.name}
+                  td
+                    input(id=data.name, type='text', name='param-' + data.name, value=value)
+            tfoot
+              tr
+                th
+                td
+                  input.btn.btn-primary(type='submit') Execute
 
 block template
   div(class='row-fluid')
     div(class='span12')
-      form(action='/post', method='post', class='well form-horizontal')
+      p The data will be submitted to 
+        mixin href(collection.href)
+      form.well(action='/write', method='post')
         input(type='hidden', name='url', value=collection.href)
-        fieldset
-          each data in collection.template.data
-            - var value = params[data.name] || data.value
-            div(class='control-group')
-              label(class='control-label', for=data.name)
-                if data.prompt
-                  | #{data.prompt}
+        table.cj-form
+          tbody
+            each data in collection.template.data
+              - var value = params[data.name] || data.value
+              tr
+                th(title="name='" + data.name + "'")
+                  div
+                    label(for=data.name)
+                      if data.prompt
+                        | #{data.prompt}
+                      else
+                        | #{data.name}
+                td
+                  input(id=data.name, type='text', name='param-' + data.name, value=value)
+          tfoot
+            tr
+              th
+              td
+                if typeof collection.href == 'undefined'
+                  input.btn.btn-primary.disabled(type='submit', disabled) Write
+                  p.help-block This collection has a template, but doesn't have a href which is required.
                 else
-                  | #{data.name}
-              div(class='controls')
-                input(type='text', name='param-' + data.name, value=value, class='input-xlarge')
+                  input.btn.btn-primary(type='submit') Write
 
         div(class='control-group')
           div(class='controls')
-            if typeof collection.href == 'undefined'
-              input.btn.btn-primary.disabled(type='submit', disabled) Write
-              p.help-block This collection has a template, but doesn't have a href which is required.
-            else
-              input.btn.btn-primary(type='submit') Write
 
 block error
   div(class='row-fluid')
@@ -233,7 +239,11 @@ block httpResponse
         each value, key in httpResponse.headers
           tr
             td #{key}:
-            td #{value}
+            td
+              if key == 'location'
+                mixin href(value)
+              else
+                | #{value}
       | 
       | #{httpResponse.body}
 
@@ -271,17 +281,24 @@ block sidebar
         each link, i in collection.links
           li: a(href='#link-' + (i + 1))
             mixin get_name(link, 'Link', i)
-        li(class='nav-header'): a(href='#items') Items
-        each item, i in collection.items
-          li: a(href='#item-' + (i + 1)) ##{i + 1}
-        li(class='nav-header'): a(href='#queries') Queries
-        each query, i in collection.queries
-          li: a(href='#query-' + (i + 1))
-            mixin get_name(query, 'Query', i)
+
+        if collection.items.length > 0
+          li(class='nav-header'): a(href='#items') Items
+          each item, i in collection.items
+            li: a(href='#item-' + (i + 1)) ##{i + 1}
+
+        if collection.queries.length > 0
+          li(class='nav-header'): a(href='#queries') Queries
+          each query, i in collection.queries
+            li: a(href='#query-' + (i + 1))
+              mixin get_name(query, 'Query', i)
+
         if typeof collection.template != 'undefined'
           li(class='nav-header'): a(href='#template') Template
+
         if typeof collection.error != 'undefined'
           li(class='nav-header'): a(href='#error') Error
+
         li(class='nav-header'): a(href='#formatted-body') Formatted Body
 
       if typeof httpResponse != 'undefined'
@@ -303,18 +320,20 @@ block inner_content
       div(class='page-header')
         h1 Meta
       block meta
-    section(id='items')
-      div(class='page-header')
-        h1 Items 
-          if collection.items.length > 1
-            span(class='badge') #{collection.items.length}
-              if root.findLinkByRel('next')
-                |+
-      block items
-    section(id='queries')
-      div(class='page-header')
-        h1 Queries
-      block queries
+    if collection.items.length > 0
+      section(id='items')
+        div(class='page-header')
+          h1 Items 
+            if collection.items.length > 1
+              span(class='badge') #{collection.items.length}
+                if root.findLinkByRel('next')
+                  |+
+        block items
+    if collection.queries.length > 0
+      section(id='queries')
+        div(class='page-header')
+          h1 Queries
+        block queries
     if typeof collection.template != 'undefined'
       section(id='template')
         div(class='page-header')

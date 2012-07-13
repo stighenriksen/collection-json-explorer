@@ -29,6 +29,16 @@ function split(str) {
 }
 exports.split = split;
 
+function extractParams(o) {
+  return _.reduce(o, function(q, value, key) {
+    if(!key.match(/^param-/)) {
+      return q;
+    }
+    q[key.substr(6)] = value;
+    return q;
+  }, {});
+}
+
 function urlgenerator(req) {
   var host = req.headers.host;
   return {
@@ -90,15 +100,50 @@ exports.delete = function(req, res) {
   }).end();
 }
 
+exports.write = function(req, res) {
+  var options = url.parse(req.body.url, false);
+  options.method = 'POST';
+  options.headers = {
+    'Content-Type': 'application/vnd.collection+json'
+  };
+//  console.log('options', options);
+
+//  console.log('params', extractParams(req.body));
+  var data = _.map(extractParams(req.body), function(value, key) {
+    return {name: key, value: value};
+  });
+  var body = {template: { data: data }};
+//  console.log('body', JSON.stringify(body));
+  function done(message, httpResponse) {
+    res.render('data', {
+      urlgenerator: urlgenerator(req),
+      url: req.body.url,
+      httpResponse: httpResponse
+    });
+  }
+  var httpRequest = http.request(options, function(httpResponse) {
+    httpResponse.setEncoding('utf8');
+    var body = '';
+    httpResponse.on('data', function (chunk) {
+      body += chunk;
+    }).on('end', function (chunk) {
+      done(undefined, {
+        statusCode: httpResponse.statusCode,
+        status: '',
+        headers: httpResponse.headers,
+        body: body
+      });
+    });
+  }).on('error', function(e) {
+    done(util.inspect(e));
+  });
+  httpRequest.write(JSON.stringify(body));
+  httpRequest.end();
+}
+
 exports.render = function(req, res) {
   var u = url.parse(req.query.url, true);
-  var params = _.reduce(req.query, function(q, value, key) {
-      if(!key.match(/^param-/)) {
-        return q;
-      }
-      q[key.substr(6)] = value;
-      return q;
-  }, {});
+  var params = extractParams(req.query);
   u.query = _.extend({}, u.query, params);
   fetchCollection(url.format(u), function(err, httpResponse) {
     if(err) {

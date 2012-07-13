@@ -23,3 +23,17 @@
   }
 }
 
+table.cj-form th {
+  text-align: right;
+  min-width: 300px;
+  padding-right: 20px;
+}
+
+table.cj-form th div {
+  margin-bottom: 10px;
+}
+
+table.cj-form tbody td,
+table.cj-form tbody input {
+  width: 100%;
+}
