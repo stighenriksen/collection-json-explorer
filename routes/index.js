@@ -115,10 +115,17 @@ exports.write = function(req, res) {
   var body = {template: { data: data }};
 //  console.log('body', JSON.stringify(body));
   function done(message, httpResponse) {
+    var parsedBody;
+    try {
+      parsedBody = JSON.parse(httpResponse.body);
+    } catch(e) {}
     res.render('data', {
       urlgenerator: urlgenerator(req),
       url: req.body.url,
-      httpResponse: httpResponse
+      root: collection_json.fromObject(parsedBody),
+      httpResponse: httpResponse,
+      parsedBody: parsedBody,
+      rawBody: httpResponse.body
     });
   }
   var httpRequest = http.request(options, function(httpResponse) {
@@ -163,7 +170,8 @@ exports.render = function(req, res) {
       params: params,
       root: collection_json.fromObject(parsedBody),
       httpResponse: httpResponse,
-      formattedBody: JSON.stringify(parsedBody, null, '  ')
+      parsedBody: parsedBody,
+      rawBody: httpResponse.body
     });
   });
 };

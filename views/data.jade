@@ -349,7 +349,12 @@ block inner_content
         h1 Formatted Body
       div(class='row-fluid')
         div(class='span12')
-          pre= formattedBody
+          if typeof rawBody == 'string'
+            if rawBody.length == 0
+              p: i No body
+            else
+              pre= JSON.stringify(parsedBody, null, '  ')
+                | #{parsedBody}
 
   if typeof httpResponse != 'undefined'
     section(id='http-response')
