@@ -7,6 +7,10 @@ var collection_json = require('collection_json')
 function split(str) {
   var u = url.parse(str);
 
+  if(typeof u.pathname != 'string') {
+    return [str];
+  }
+
   var segments = u.pathname.replace(/\/$/, '').split('/');
 
   var splits = _.map(_.range(segments.length), function(i) {
@@ -96,7 +100,7 @@ exports.delete = function(req, res) {
       });
     });
   }).on('error', function(e) {
-      done(util.inspect(e));
+    done(util.inspect(e));
   }).end();
 }
 
