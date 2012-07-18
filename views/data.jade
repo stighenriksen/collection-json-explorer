@@ -220,7 +220,13 @@ block error
       dt message
       dd
         if collection.error.message
-          | #{collection.error.message}
+          - var lines = collection.error.message.split('\n')
+          if lines.length > 1
+            for line in lines
+              | #{line.replace(/ /g, '&nbsp;')}
+              br
+          else
+            | #{collection.error.message}
         else
           i Not set
 

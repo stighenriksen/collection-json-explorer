@@ -32,3 +32,6 @@
 
 * BUG: when executing queries, the URL in the "http response" section
   is not the correct url, it's missing the query parameters.
+
+* Add an OpenSearch document to the root page so that people can add
+  the site as an search engine.
