@@ -91,7 +91,7 @@ exports.delete = function(req, res) {
     var body = '';
     httpResponse.on('data', function (chunk) {
       body += chunk;
-    }).on('end', function (chunk) {
+    }).on('end', function () {
       done(undefined, {
         statusCode: httpResponse.statusCode,
         status: '',
@@ -137,7 +137,7 @@ exports.write = function(req, res) {
     var body = '';
     httpResponse.on('data', function (chunk) {
       body += chunk;
-    }).on('end', function (chunk) {
+    }).on('end', function () {
       done(undefined, {
         statusCode: httpResponse.statusCode,
         status: '',
@@ -191,7 +191,7 @@ function fetchCollection(u, cb) {
     res.on('data', function (chunk) {
       body += chunk;
     });
-    res.on('end', function (chunk) {
+    res.on('end', function () {
       cb(undefined, {
         statusCode: res.statusCode,
         status: '',
