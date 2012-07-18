@@ -16,6 +16,8 @@ html
     link(href='/bootstrap-2.0.4/css/bootstrap-responsive.css', rel='stylesheet')
     // if lt IE 9
       script(src='http://html5shim.googlecode.com/svn/trunk/html5.js')
+    if typeof process.env.head_snippet === 'string'
+      | !{process.env.head_snippet}
 
   body(data-spy='scroll')
     // block navbar
