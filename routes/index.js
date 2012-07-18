@@ -25,8 +25,14 @@ function split(str) {
     }
   });
 
+  // Append the query as a single segment
+  // If not query, append the slash slash if it's missing.
   if(u.search) {
     splits.push([(u.pathname.match(/\/$/) ? '/' : '') + u.search, url.format(u)]);
+  } else if(str.match(/\/$/)) {
+    var last = splits[splits.length - 1];
+    last[0] = last[0] + '/';
+    last[1] = last[1] + '/';
   }
 
   return splits;

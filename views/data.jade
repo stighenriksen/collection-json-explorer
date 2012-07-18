@@ -8,7 +8,7 @@ mixin get_name(link, prefix, i)
 
 // TODO: Show show a 'copy' button to copy the entire link
 mixin href(href)
-  if typeof href != 'string'
+  if typeof href !== 'string'
     i no href
   else
     - var splits = urlgenerator.split(href)

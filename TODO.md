@@ -29,3 +29,6 @@
   collection+json documents.
 
   Make interactive so people can collaborate on a single specification.
+
+* BUG: when executing queries, the URL in the "http response" section
+  is not the correct url, it's missing the query parameters.
