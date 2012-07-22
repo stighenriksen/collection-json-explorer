@@ -23,6 +23,9 @@
   }
 }
 
+/**
+ * Forms
+ */
 table.cj-form th {
   text-align: right;
   min-width: 300px;
@@ -36,4 +39,24 @@ table.cj-form th div {
 table.cj-form tbody td,
 table.cj-form tbody input {
   width: 100%;
+}
+
+/**
+ * Item's data table
+ */
+table.data-table {
+  margin-top: 1em;
+  margin-bottom: 1em;
+}
+
+table.data-table th {
+  text-align: right;
+  padding-right: 1em;
+  font-weight: bold;
+  min-width: 120px;
+}
+
+table.data-table th,
+table.data-table td {
+  vertical-align: top;
 }

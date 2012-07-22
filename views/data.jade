@@ -121,9 +121,11 @@ block items
             | 
             a(class='btn btn-danger btn-mini', href=urlgenerator.delete(url, item.href)) Delete
 
-    dl
-      dt href
-      dd: div: mixin href(item.href)
+      div(class='fluid-row')
+        div(class='span12')
+          dl
+            dt href
+            dd: div: mixin href(item.href)
 
     if item.links.length > 0
       h3 Item Links
@@ -132,10 +134,13 @@ block items
         block link
 
     h3 Data
-    dl(class='dl-horizontal')
-      each data in item.data
-        dt #{data.name}
-        dd #{data.value}
+    div(class='fluid-row')
+      div(class='span12')
+        table.data-table
+          each data in item.data
+            tr
+              th #{data.name}
+              td #{data.value}
 
   block items_links
 

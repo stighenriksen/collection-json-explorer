@@ -1,4 +1,5 @@
 var collection_json = require('collection_json')
+  , explorer = require('../lib/explorer.js')
   , http = require('http')
   , url = require('url')
   , util = require('util')
@@ -162,16 +163,16 @@ exports.render = function(req, res) {
   var u = url.parse(req.query.url, true);
   var params = extractParams(req.query);
   u.query = _.extend({}, u.query, params);
-  fetchCollection(url.format(u), function(err, httpResponse) {
+  explorer.fetchCollection(url.format(u), function(err, result) {
     if(err) {
-      sendErr(req, res, err, httpResponse);
+      sendErr(req, res, err, result);
       return;
     }
     var parsedBody;
     try {
-      parsedBody = JSON.parse(httpResponse.body);
+      parsedBody = JSON.parse(result.body);
     } catch(e) {
-      sendErr(req, res, 'Unable to parse JSON: ' + e, httpResponse);
+      sendErr(req, res, 'Unable to parse JSON: ' + e, result);
       return;
     }
     res.render('data', {
@@ -179,33 +180,10 @@ exports.render = function(req, res) {
       url: req.query.url, referer: req.query.referer,
       params: params,
       root: collection_json.fromObject(parsedBody),
-      httpResponse: httpResponse,
+      httpResponse: result.res,
       parsedBody: parsedBody,
-      rawBody: httpResponse.body
+      rawBody: result.body
     });
   });
 };
 
-function fetchCollection(u, cb) {
-  var options = url.parse(u);
-  options.headers = {
-    accept: 'application/vnd.collection+json'
-  };
-  var req = http.get(options, function(res) {
-    res.setEncoding('utf8');
-    var body = '';
-    res.on('data', function (chunk) {
-      body += chunk;
-    });
-    res.on('end', function () {
-      cb(undefined, {
-        statusCode: res.statusCode,
-        status: '',
-        headers: res.headers,
-        body: body
-      });
-    });
-  }).on('error', function() {
-    cb('Unable to fetch ' + u);
-  });
-}
