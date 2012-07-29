@@ -23,7 +23,8 @@
   warnings and have the browser remember which warnings has been
   silenced.
 
-* Support uploading of c+j documents.
+* Support uploading of c+j documents to allow people to work on
+  example documents in an interactive way.
 
 * Create a generator that users can use to create their own
   collection+json documents.
@@ -35,6 +36,11 @@
 
 * Add an OpenSearch document to the root page so that people can add
   the site as an search engine.
+
+# UI
+
+* Add a setting to optionally show the URL. Default to not showing the
+  URLs to signify that the URLs are not important.
 
 # Document features
 
