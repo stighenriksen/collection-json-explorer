@@ -110,37 +110,66 @@ block items
   block items_links
 
   each item, i in collection.items
-    h2(id='item-#{i+1}') Item ##{i+1}
-    if item.href
-      div(class='fluid-row')
-        div(class='span12')
-          p
-            a(class='btn btn-primary btn-mini', href=urlgenerator.render(item.href)) Explore
-            | 
-            a(class='btn btn-primary btn-mini', href=item.href) Raw
-            | 
-            a(class='btn btn-danger btn-mini', href=urlgenerator.delete(url, item.href)) Delete
+    div.item-container
+      h2(id='item-#{i+1}') Item ##{i+1}
+      if item.href
+        div(class='fluid-row')
+          div(class='span12')
+            p
+              a.btn.btn-primary.btn-mini(href=urlgenerator.render(item.href)) Explore
+              | 
+              a.btn.btn-primary.btn-mini(href=item.href) Raw
+              | 
+              a.btn.btn-primary.btn-mini(onClick='var item = $(this).parentsUntil("#items").last(); item.find(".item-form").toggle(); item.find(".item-data").toggle()') Edit
+              | 
+              a.btn.btn-danger.btn-mini(href=urlgenerator.delete(url, item.href)) Delete
 
-      div(class='fluid-row')
-        div(class='span12')
-          dl
-            dt href
-            dd: div: mixin href(item.href)
+        div(class='fluid-row')
+          div(class='span12')
+            dl
+              dt href
+              dd: div: mixin href(item.href)
 
-    if item.links.length > 0
-      h3 Item Links
-      each link, i in item.links
-        h4 Item Link ##{i}
-        block link
+      if item.links.length > 0
+        h3 Item Links
+        each link, i in item.links
+          h4 Item Link ##{i}
+          block link
 
-    h3 Data
-    div(class='fluid-row')
-      div(class='span12')
-        table.data-table
-          each data in item.data
-            tr
-              th #{data.name}
-              td #{data.value}
+      h3.item-data Data
+      div.item-data.fluid-row
+        div.span12
+          table.data-table
+            each data in item.data
+              tr
+                th #{data.name}
+                td #{data.value}
+
+      h3.item-form(style='display: none') Data
+      div.item-form.fluid-row(style='display: none')
+        div.span12
+          form.well(action='/write', method='POST')
+            input(type='hidden', name='url', value=item.href)
+            table.cj-form
+              tbody
+                each data in item.data
+                  - var value = params[data.name] || data.value
+                  tr
+                    th(title="name: " + data.name)
+                      div
+                        label(for=data.name)
+                          if data.prompt
+                            | #{data.prompt}
+                          else
+                            | #{data.name}
+                    td
+                      input(id=data.name, type='text', name='param-' + data.name, value=value)
+              tfoot
+                tr
+                  th
+                  td
+                    p
+                      input.btn.btn-primary(type='submit') Update
 
   block items_links
 
@@ -178,7 +207,7 @@ block template
     div(class='span12')
       p The data will be submitted to 
         mixin href(collection.href)
-      form.well(action='/write', method='post')
+      form.well(action='/write', method='POST')
         input(type='hidden', name='url', value=collection.href)
         table.cj-form
           tbody
@@ -256,7 +285,7 @@ block httpResponse
               else
                 | #{value}
       | 
-      | #{httpResponse.body}
+      | #{rawBody}
 
 block navbar
   div(class='navbar navbar-fixed-top')
@@ -310,6 +339,7 @@ block sidebar
         if typeof collection.error != 'undefined'
           li(class='nav-header'): a(href='#error') Error
 
+      if typeof parsedBody == 'object'
         li(class='nav-header'): a(href='#formatted-body') Formatted Body
 
       if typeof httpResponse != 'undefined'
@@ -355,17 +385,14 @@ block inner_content
         div(class='page-header')
           h1 Error
         block error
-    section(id='formatted-body')
-      div(class='page-header')
-        h1 Formatted Body
-      div(class='row-fluid')
-        div(class='span12')
-          if typeof rawBody == 'string'
-            if rawBody.length == 0
-              p: i No body
-            else
-              pre= JSON.stringify(parsedBody, null, '  ')
-                | #{parsedBody}
+    if typeof parsedBody == 'object'
+      section(id='formatted-body')
+        div(class='page-header')
+          h1 Formatted Body
+        div(class='row-fluid')
+          div(class='span12')
+            pre= JSON.stringify(parsedBody, null, '  ')
+              | #{parsedBody}
 
   if typeof httpResponse != 'undefined'
     section(id='http-response')
