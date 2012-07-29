@@ -117,15 +117,15 @@ exports.write = function(req, res) {
   options.headers = {
     'Content-Type': 'application/vnd.collection+json'
   };
-//  console.log('options', options);
+  // console.log('options', options);
 
-//  console.log('params', extractParams(req.body));
   var data = _.map(extractParams(req.body), function(value, key) {
     return {name: key, value: value};
   });
   var body = {template: { data: data }};
-//  console.log('body', JSON.stringify(body));
+  // console.log('body', JSON.stringify(body, null, '  '));
   function done(message, httpResponse) {
+    // console.log('done', arguments);
     var parsedBody;
     try {
       parsedBody = JSON.parse(httpResponse.body);
@@ -136,7 +136,7 @@ exports.write = function(req, res) {
       root: collection_json.fromObject(parsedBody),
       httpResponse: httpResponse,
       parsedBody: parsedBody,
-      rawBody: httpResponse.body
+      rawBody: typeof httpResponse == 'object' ? httpResponse.body : undefined,
     });
   }
   var httpRequest = http.request(options, function(httpResponse) {
