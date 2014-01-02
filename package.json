@@ -6,7 +6,7 @@
     "test": "./node_modules/.bin/mocha"
   },
   "dependencies": {
-    "collection_json": "git+https://github.com/stighenriksen/collection-json-explorer.git",
+    "collection_json": "git+http://trygvis.io/~trygvis/git/2012/06/collection_json.js.git/",
     "express": "3.0.0beta4",
     "jade": "~0.26.3",
     "nodemailer": "~0.3.21",
